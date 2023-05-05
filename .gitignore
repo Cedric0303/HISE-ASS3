@@ -9,4 +9,5 @@
 *.gcov
 *.bexch
 *.o
+/.vscode
 /obj
