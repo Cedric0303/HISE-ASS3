@@ -1,0 +1,12 @@
+*.a
+*.ali
+*.gli
+*.exe
+*.stderr
+*.stdout
+*.gcda
+*.gcno
+*.gcov
+*.bexch
+*.o
+/obj
