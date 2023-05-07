@@ -17,10 +17,25 @@ package body MyStringTokeniser with SPARK_Mode is
          pragma Loop_Invariant
            (for all J in Tokens'First..OutIndex-1 =>
               (Tokens(J).Start >= S'First and
+              -- ensure the first letter of the each token corresponds with
+              -- with the starting character of the continuously-truncated
+              -- input string (with whitespace removed)
                    Tokens(J).Length > 0) and then
+                   -- 
             Tokens(J).Length-1 <= S'Last - Tokens(J).Start);
+         -- before the looop, at the beginning, middle and end of the loop,
+         -- for all tokens in the 'Tokens' array:
+         -- the first letter of each token corresponds with the starting
+         -- character of the continuously-truncated input string 
+         -- (with whitespace removed), and each token's length is always 
+         -- valid (non-empty)
 
          pragma Loop_Invariant (OutIndex = Tokens'First + Count);
+         -- before the looop, at the beginning, middle and end of the loop,
+         -- the returned output index is always the first element of the 
+         -- 'Token' array plus the number of tokens found from inside the loop,
+         -- ensures the output index corresponds with the number of elements
+         -- in the 'Token' array
 
          -- look for start of next token
          while (Index >= S'First and Index < S'Last) and then Is_Whitespace(S(Index)) loop
