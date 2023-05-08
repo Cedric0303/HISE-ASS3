@@ -17,23 +17,17 @@ with Ada.Long_Long_Integer_Text_IO;
 procedure Main is
    --  DB : VariableStore.Database;
    --  V1 : VariableStore.Variable := VariableStore.From_String("Var1");
-   --  PIN1  : PIN.PIN := PIN.From_String("1234");
-   --  PIN2  : PIN.PIN := PIN.From_String("1234");
    Unlocked : Boolean := false;
    Done : Boolean := false;
    package Lines is new MyString(Max_MyString_Length => 2048);
    S  : Lines.MyString;
 begin
-
-   --  Put(MyCommandLine.Command_Name); Put_Line(" is running!");
-
-   --  Put("I was invoked with "); 
-   --  Put(MyCommandLine.Argument_Count,0); 
-   --  Put_Line(" arguments.");
    declare
-      PIN1 : PIN.PIN := PIN.From_String(MyCommandLine.Argument(1));
+      PIN1 : PIN.PIN;
       PIN2 : PIN.PIN;
    begin
+   if MyCommandLine.Argument_Count = 2 then
+      PIN1 := PIN.From_String(MyCommandLine.Argument(1));
       while not Done loop
          if Unlocked then
             Put("unlocked>");
@@ -47,27 +41,35 @@ begin
             TokStr1 : Unbounded_String;
             TokStr2 : Unbounded_String;
             TokStr3 : Unbounded_String;
-         begin
-            MyStringTokeniser.Tokenise(Lines.To_String(S),T,NumTokens);
-            if NumTokens = 2 then
-                TokStr1 := To_Unbounded_String(Lines.To_String(Lines.Substring(S,T(1).Start,T(1).Start+T(1).Length-1)));
-                TokStr2 := To_Unbounded_String(Lines.To_String(Lines.Substring(S,T(2).Start,T(2).Start+T(2).Length-1)));
-            end if;
-            if not Unlocked and To_String(TokStr1) = "unlock" then
-               PIN2 := PIN.From_String(To_String(TokStr2));
-               if PIN."="(PIN1,PIN2) then
-                  Put_Line("Calculated unlocked.");
-                  Unlocked := True;
-               else
-                  Put_Line("Wrong PIN.");
+            begin
+               MyStringTokeniser.Tokenise(Lines.To_String(S),T,NumTokens);
+               if NumTokens = 2 then
+                  TokStr1 := To_Unbounded_String(Lines.To_String(Lines.Substring(S,T(1).Start,T(1).Start+T(1).Length-1)));
+                  TokStr2 := To_Unbounded_String(Lines.To_String(Lines.Substring(S,T(2).Start,T(2).Start+T(2).Length-1)));
                end if;
-            elsif Unlocked then
-               Process(To_String(TokStr1), To_String(TokStr2), Done);
-            else
-               Put_Line("Calculator locked.");
-            end if;
-         end;
-      end loop;
+               if not Unlocked then
+                  if To_String(TokStr1) = "unlock" then
+                     PIN2 := PIN.From_String(To_String(TokStr2));
+                     if PIN."="(PIN1,PIN2) then
+                        Put_Line("Calculated unlocked.");
+                        Unlocked := True;
+                     else
+                        Put_Line("Wrong PIN.");
+                     end if;
+                  else
+                     Put_Line("Calculator locked.");
+                  end if;
+               elsif Unlocked then
+                  if not To_String(TokStr1) = "unlock" then
+                     Process(To_String(TokStr1), To_String(TokStr2), Done);
+                  end if;
+               end if;
+            end;
+         end loop;
+      else
+         Put_Line("Please supply a master PIN.");
+         return;
+      end if;
    end;
     
 end Main;
