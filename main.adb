@@ -15,24 +15,23 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Long_Long_Integer_Text_IO;
 
 procedure Main is
-   --  DB : VariableStore.Database;
-   --  V1 : VariableStore.Variable := VariableStore.From_String("Var1");
+   DB : VariableStore.Database;
+   LastCommand : VariableStore.Variable;
    Unlocked : Boolean := false;
    Done : Boolean := false;
    package Lines is new MyString(Max_MyString_Length => 2048);
    S  : Lines.MyString;
+   PIN1 : PIN.PIN;
+   PIN2 : PIN.PIN;
 begin
-   declare
-      PIN1 : PIN.PIN;
-      PIN2 : PIN.PIN;
-   begin
-   if MyCommandLine.Argument_Count = 2 then
+   if MyCommandLine.Argument_Count = 1 then
+      VariableStore.Init(DB);
       PIN1 := PIN.From_String(MyCommandLine.Argument(1));
       while not Done loop
          if Unlocked then
-            Put("unlocked>");
+            Put("unlocked> ");
          else
-            Put("locked>  ");
+            Put("locked>   ");
          end if;
          Lines.Get_Line(S);
          declare
@@ -46,6 +45,9 @@ begin
                if NumTokens = 2 then
                   TokStr1 := To_Unbounded_String(Lines.To_String(Lines.Substring(S,T(1).Start,T(1).Start+T(1).Length-1)));
                   TokStr2 := To_Unbounded_String(Lines.To_String(Lines.Substring(S,T(2).Start,T(2).Start+T(2).Length-1)));
+               elsif NumTokens = 1 then
+                  TokStr1 := To_Unbounded_String(Lines.To_String(Lines.Substring(S,T(1).Start,T(1).Start+T(1).Length-1)));
+                  TokStr2 := Null_Unbounded_String;
                end if;
                if not Unlocked then
                   if To_String(TokStr1) = "unlock" then
@@ -60,16 +62,15 @@ begin
                      Put_Line("Calculator locked.");
                   end if;
                elsif Unlocked then
-                  if not To_String(TokStr1) = "unlock" then
-                     Process(To_String(TokStr1), To_String(TokStr2), Done);
+                  if To_String(TokStr1) /= "unlock" then
+                     Process(DB, LastCommand, 
+                           To_String(TokStr1), To_String(TokStr2), Done);
                   end if;
                end if;
             end;
          end loop;
-      else
-         Put_Line("Please supply a master PIN.");
-         return;
-      end if;
-   end;
-    
+   else
+      Put_Line("Please supply a master PIN.");
+      return;
+   end if;
 end Main;
