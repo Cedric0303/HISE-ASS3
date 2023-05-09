@@ -21,6 +21,17 @@ package Calculator is
                      arg1 : in String;
                      arg2 : in String;
                      done : in out Boolean);
+   
+   procedure Plus(db : in out VariableStore.Database;
+                  commandarray : in out VariableArray);
+
+   procedure Minus(db : in out VariableStore.Database;
+                   commandarray : in out VariableArray);
+   procedure Multiply(db : in out VariableStore.Database;
+                      commandarray : in out VariableArray);
+
+   procedure Divide(db : in out VariableStore.Database;
+                    commandarray : in out VariableArray);
 
    procedure Push(db : in out VariableStore.Database;
                   commandarray : in out VariableArray;
@@ -30,8 +41,8 @@ package Calculator is
                  commandarray : in out VariableArray);
 
       procedure Load(db : in out VariableStore.Database;
-                  commandarray : in out VariableArray;
-                  var : VariableStore.Variable);
+                     commandarray : in out VariableArray;
+                     var : VariableStore.Variable);
    
    procedure Store(db : in out VariableStore.Database;
                    commandarray : in out VariableArray;
