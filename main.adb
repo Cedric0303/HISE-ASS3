@@ -16,7 +16,7 @@ with Ada.Long_Long_Integer_Text_IO;
 
 procedure Main is
    DB : VariableStore.Database;
-   LastCommand : VariableStore.Variable;
+   LastCommands : VariableArray;
    Unlocked : Boolean := false;
    Done : Boolean := false;
    package Lines is new MyString(Max_MyString_Length => 2048);
@@ -63,7 +63,7 @@ begin
                   end if;
                elsif Unlocked then
                   if To_String(TokStr1) /= "unlock" then
-                     Process(DB, LastCommand, 
+                     Process(DB, LastCommands,
                            To_String(TokStr1), To_String(TokStr2), Done);
                   end if;
                end if;
