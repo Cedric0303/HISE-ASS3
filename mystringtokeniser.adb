@@ -23,7 +23,7 @@ package body MyStringTokeniser with SPARK_Mode is
                    Tokens(J).Length > 0) and then
                    -- 
             Tokens(J).Length-1 <= S'Last - Tokens(J).Start);
-         -- before the looop, at the beginning, middle and end of the loop,
+         -- before the loop, at the beginning, middle and end of the loop,
          -- for all tokens in the 'Tokens' array:
          -- the first letter of each token corresponds with the starting
          -- character of the continuously-truncated input string 
@@ -31,7 +31,7 @@ package body MyStringTokeniser with SPARK_Mode is
          -- valid (non-empty)
 
          pragma Loop_Invariant (OutIndex = Tokens'First + Count);
-         -- before the looop, at the beginning, middle and end of the loop,
+         -- before the loop, at the beginning, middle and end of the loop,
          -- the returned output index is always the first element of the 
          -- 'Token' array plus the number of tokens found from inside the loop,
          -- ensures the output index corresponds with the number of elements

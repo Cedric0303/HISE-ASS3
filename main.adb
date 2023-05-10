@@ -61,14 +61,15 @@ begin
                   else
                      Put_Line("Calculator locked.");
                   end if;
-               elsif Unlocked then
-                  if To_String(TokStr1) /= "unlock" then
-                     Process(DB, LastCommands,
-                           To_String(TokStr1), To_String(TokStr2), Done);
-                  end if;
+               elsif To_String(TokStr1) = "lock" then
+                  PIN1 := PIN.From_String(To_String(TokStr2));
+                  Unlocked := False;
+                  Put_Line("Calculator locked.");
+               else
+                  Process(DB, LastCommands,To_String(TokStr1), To_String(TokStr2), Done);
                end if;
             end;
-         end loop;
+      end loop;
    else
       Put_Line("Please supply a master PIN.");
       return;
