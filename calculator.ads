@@ -15,42 +15,29 @@ package Calculator is
    --  Max_Commands : constant Natural := 1024;
    --  type Index is range 1 .. Max_Commands;
    --  type LastCommandsArray is array (Index) of VariableStore.Variable;
-
-   procedure Process(db : in out VariableStore.Database;
-                     commandarray : in out VariableArray;
-                     arg1 : in String;
-                     arg2 : in String;
-                     done : in out Boolean);
    
-   procedure Plus(db : in out VariableStore.Database;
-                  commandarray : in out VariableArray);
+   procedure Init;
 
-   procedure Minus(db : in out VariableStore.Database;
-                   commandarray : in out VariableArray);
-   procedure Multiply(db : in out VariableStore.Database;
-                      commandarray : in out VariableArray);
-
-   procedure Divide(db : in out VariableStore.Database;
-                    commandarray : in out VariableArray);
-
-   procedure Push(db : in out VariableStore.Database;
-                  commandarray : in out VariableArray;
-                  value : in Integer);
-
-   procedure Pop(db : in out VariableStore.Database;
-                 commandarray : in out VariableArray);
-
-      procedure Load(db : in out VariableStore.Database;
-                     commandarray : in out VariableArray;
-                     var : VariableStore.Variable);
+   procedure Process(arg1 : in String; arg2 : in String);
    
-   procedure Store(db : in out VariableStore.Database;
-                   commandarray : in out VariableArray;
-                   var : in VariableStore.Variable);
-   
-   procedure Remove(db : in out VariableStore.Database;
-                    commandarray : in out VariableArray;
-                    var : in VariableStore.Variable);
+   procedure Plus;
 
-   procedure List(db : in VariableStore.Database);
+   procedure Minus;
+   
+   procedure Multiply;
+
+   procedure Divide;
+
+   procedure Push(value : in Integer);
+
+   procedure Pop;
+
+   procedure Load(var : VariableStore.Variable);
+   
+   procedure Store(var : in VariableStore.Variable);
+   
+   procedure Remove(var : in VariableStore.Variable);
+
+   procedure List;
+   
 end Calculator;

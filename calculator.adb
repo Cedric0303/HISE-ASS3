@@ -6,213 +6,200 @@ with StringToInteger;
 with IntegerToString;
 
 package body Calculator is
-   UNLOCKED : Boolean := false;
-   DONE : Boolean := false;
+   DB : VariableStore.Database;
+   CommandArray : Calculator.VariableArray;
+   
+   procedure Init is
+   begin
+      VariableStore.Init(DB);
+   end Init;
 
-   procedure Process(db : in out VariableStore.Database;
-                     commandarray : in out VariableArray;
-                     arg1 : in String;
-                     arg2 : in String;
-                     done : in out Boolean) is
+   procedure Process(arg1 : in String;
+                     arg2 : in String) is
    begin
       --  Put(Integer (VariableStore.Length(db)));Put_Line("");
       --  Put(arg1);Put(":");Put_Line(arg2);
       if arg1 = "+" then
-         Plus(db, commandarray);
+         Plus;
       elsif arg1 = "-" then
-         Minus(db, commandarray);
+         Minus;
       elsif arg1 = "*" then
-         Multiply(db, commandarray);
+         Multiply;
       elsif arg1 = "/" then
-         Divide(db, commandarray);
+         Divide;
       elsif arg1 = "push" then
-         Push(db, commandarray, StringToInteger.From_String(arg2));
+         Push(StringToInteger.From_String(arg2));
       elsif arg1 = "pop" then
-         Pop(db, commandarray);
+         Pop;
       elsif arg1 = "load" then
-         Load(db, commandarray, VariableStore.From_String(arg2));
+         Load(VariableStore.From_String(arg2));
       elsif arg1 = "store" then
-         Store(db, commandarray, VariableStore.From_String(arg2));
+         Store(VariableStore.From_String(arg2));
       elsif arg1 = "remove" then
-         Remove(db, commandarray, VariableStore.From_String(arg2));
+         Remove(VariableStore.From_String(arg2));
       elsif arg1 = "list" then
-         List(db);
-      elsif arg1 = "exit" then
-         done := True;
+         List;
       end if;
    end Process;
 
-   procedure Plus(db : in out VariableStore.Database;
-                  commandarray : in out VariableArray) is
+   procedure Plus is
    begin
       declare
          lastcommand : VariableStore.Variable;
          lastlastcommand : VariableStore.Variable;
          val1 : Integer;
          val2 : Integer;
-         var : VariableStore.Variable := VariableStore.From_String("plus" & IntegerToString.To_String(Integer(VariableStore.Length(db))));
+         var : VariableStore.Variable := VariableStore.From_String("plus" & IntegerToString.To_String(Integer(VariableStore.Length(DB))));
       begin
-         lastcommand := Last_Element(commandarray);
-         Delete_Last(commandarray);
-         lastlastcommand := Last_Element(commandarray);
-         Delete_Last(commandarray);
+         lastcommand := Last_Element(CommandArray);
+         Delete_Last(CommandArray);
+         lastlastcommand := Last_Element(CommandArray);
+         Delete_Last(CommandArray);
 
-         val1 := VariableStore.Get(db, lastlastcommand);
-         val2 := VariableStore.Get(db, lastcommand);
+         val1 := VariableStore.Get(DB, lastlastcommand);
+         val2 := VariableStore.Get(DB, lastcommand);
 
-         VariableStore.Remove(db, lastcommand);
-         VariableStore.Remove(db, lastlastcommand);
+         VariableStore.Remove(DB, lastcommand);
+         VariableStore.Remove(DB, lastlastcommand);
 
-         VariableStore.Put(db, var, val1 + val2);
+         VariableStore.Put(DB, var, val1 + val2);
 
-         Append(commandarray, var);
+         Append(CommandArray, var);
       end;
    end Plus;
 
-   procedure Minus(db : in out VariableStore.Database;
-                   commandarray : in out VariableArray) is
+   procedure Minus is
    begin
       declare
          lastcommand : VariableStore.Variable;
          lastlastcommand : VariableStore.Variable;
          val1 : Integer;
          val2 : Integer;
-         var : VariableStore.Variable := VariableStore.From_String("mins" & IntegerToString.To_String(Integer(VariableStore.Length(db))));
+         var : VariableStore.Variable := VariableStore.From_String("mins" & IntegerToString.To_String(Integer(VariableStore.Length(DB))));
       begin
-         lastcommand := Last_Element(commandarray);
-         Delete_Last(commandarray);
-         lastlastcommand := Last_Element(commandarray);
-         Delete_Last(commandarray);
+         lastcommand := Last_Element(CommandArray);
+         Delete_Last(CommandArray);
+         lastlastcommand := Last_Element(CommandArray);
+         Delete_Last(CommandArray);
 
-         val1 := VariableStore.Get(db, lastlastcommand);
-         val2 := VariableStore.Get(db, lastcommand);
+         val1 := VariableStore.Get(DB, lastlastcommand);
+         val2 := VariableStore.Get(DB, lastcommand);
 
-         VariableStore.Remove(db, lastcommand);
-         VariableStore.Remove(db, lastlastcommand);
+         VariableStore.Remove(DB, lastcommand);
+         VariableStore.Remove(DB, lastlastcommand);
 
-         VariableStore.Put(db, var, val1 - val2);
+         VariableStore.Put(DB, var, val1 - val2);
 
-         Append(commandarray, var);
+         Append(CommandArray, var);
       end;
    end Minus;
 
-   procedure Multiply(db : in out VariableStore.Database;
-                      commandarray : in out VariableArray) is
+   procedure Multiply is
    begin
       declare
          lastcommand : VariableStore.Variable;
          lastlastcommand : VariableStore.Variable;
          val1 : Integer;
          val2 : Integer;
-         var : VariableStore.Variable := VariableStore.From_String("mult" & IntegerToString.To_String(Integer(VariableStore.Length(db))));
+         var : VariableStore.Variable := VariableStore.From_String("mult" & IntegerToString.To_String(Integer(VariableStore.Length(DB))));
       begin
-         lastcommand := Last_Element(commandarray);
-         Delete_Last(commandarray);
-         lastlastcommand := Last_Element(commandarray);
-         Delete_Last(commandarray);
+         lastcommand := Last_Element(CommandArray);
+         Delete_Last(CommandArray);
+         lastlastcommand := Last_Element(CommandArray);
+         Delete_Last(CommandArray);
 
-         val1 := VariableStore.Get(db, lastlastcommand);
-         val2 := VariableStore.Get(db, lastcommand);
+         val1 := VariableStore.Get(DB, lastlastcommand);
+         val2 := VariableStore.Get(DB, lastcommand);
 
-         VariableStore.Remove(db, lastcommand);
-         VariableStore.Remove(db, lastlastcommand);
+         VariableStore.Remove(DB, lastcommand);
+         VariableStore.Remove(DB, lastlastcommand);
 
-         VariableStore.Put(db, var, val1 * val2);
+         VariableStore.Put(DB, var, val1 * val2);
 
-         Append(commandarray, var);
+         Append(CommandArray, var);
       end;
    end Multiply;
 
-   procedure Divide(db : in out VariableStore.Database;
-                    commandarray : in out VariableArray) is
+   procedure Divide is
    begin
       declare
          lastcommand : VariableStore.Variable;
          lastlastcommand : VariableStore.Variable;
          val1 : Integer;
          val2 : Integer;
-         var : VariableStore.Variable := VariableStore.From_String("divd" & IntegerToString.To_String(Integer(VariableStore.Length(db))));
+         var : VariableStore.Variable := VariableStore.From_String("divd" & IntegerToString.To_String(Integer(VariableStore.Length(DB))));
       begin
-         lastcommand := Last_Element(commandarray);
-         Delete_Last(commandarray);
-         lastlastcommand := Last_Element(commandarray);
-         Delete_Last(commandarray);
+         lastcommand := Last_Element(CommandArray);
+         Delete_Last(CommandArray);
+         lastlastcommand := Last_Element(CommandArray);
+         Delete_Last(CommandArray);
 
-         val1 := VariableStore.Get(db, lastlastcommand);
-         val2 := VariableStore.Get(db, lastcommand);
+         val1 := VariableStore.Get(DB, lastlastcommand);
+         val2 := VariableStore.Get(DB, lastcommand);
 
-         VariableStore.Remove(db, lastcommand);
-         VariableStore.Remove(db, lastlastcommand);
+         VariableStore.Remove(DB, lastcommand);
+         VariableStore.Remove(DB, lastlastcommand);
 
-         VariableStore.Put(db, var, val1 / val2);
+         VariableStore.Put(DB, var, val1 / val2);
 
-         Append(commandarray, var);
+         Append(CommandArray, var);
       end;
    end Divide;
 
-   procedure Push(db : in out VariableStore.Database;
-                  commandarray : in out VariableArray;
-                  value : in Integer) is
+   procedure Push(value : in Integer) is
    begin
       declare
-         var : VariableStore.Variable := VariableStore.From_String("push" & IntegerToString.To_String(Integer(VariableStore.Length(db))));
+         var : VariableStore.Variable := VariableStore.From_String("push" & IntegerToString.To_String(Integer(VariableStore.Length(DB))));
       begin
-         VariableStore.Put(db, var, value);
-         Append(commandarray,var);
+         VariableStore.Put(DB, var, value);
+         Append(CommandArray, var);
       end;
    end Push;
    
-   procedure Pop(db : in out VariableStore.Database;
-                 commandarray : in out VariableArray) is
+   procedure Pop is
    begin
       declare
-         lastcommand : VariableStore.Variable := Last_Element(commandarray);
+         lastcommand : VariableStore.Variable := Last_Element(CommandArray);
       begin
-         VariableStore.Remove(db, lastcommand);
-         Delete(commandarray, Last_Index(commandarray));
+         VariableStore.Remove(DB, lastcommand);
+         Delete(CommandArray, Last_Index(CommandArray));
       end;
    end Pop;
 
-   procedure Load(db : in out VariableStore.Database;
-                  commandarray : in out VariableArray;
-                  var : VariableStore.Variable) is
+   procedure Load(var : VariableStore.Variable) is
    begin
       declare
-         lastcommand : VariableStore.Variable := Last_Element(commandarray);
-         value : Integer := VariableStore.Get(db, lastcommand);
-         var : VariableStore.Variable := VariableStore.From_String("load" & IntegerToString.To_String(Integer(VariableStore.Length(db))));
+         lastcommand : VariableStore.Variable := Last_Element(CommandArray);
+         value : Integer := VariableStore.Get(DB, lastcommand);
+         var : VariableStore.Variable := VariableStore.From_String("load" & IntegerToString.To_String(Integer(VariableStore.Length(DB))));
       begin
-         VariableStore.Put(db, var, value);
-         Append(commandarray, var);
+         VariableStore.Put(DB, var, value);
+         Append(CommandArray, var);
       end;
    end Load;
    
-   procedure Store(db : in out VariableStore.Database;
-                   commandarray : in out VariableArray;
-                   var : in VariableStore.Variable) is
+   procedure Store(var : in VariableStore.Variable) is
    begin
       declare
-         lastcommand : VariableStore.Variable := Last_Element(commandarray);
+         lastcommand : VariableStore.Variable := Last_Element(CommandArray);
          value : Integer := VariableStore.Get(db, lastcommand);
       begin
-         VariableStore.Remove(db, lastcommand);
-         VariableStore.Put(db, var, value);
-         Delete_Last(commandarray);
-         Append(commandarray, var);
+         VariableStore.Remove(DB, lastcommand);
+         VariableStore.Put(DB, var, value);
+         Delete_Last(CommandArray);
+         Append(CommandArray, var);
       end;
    end Store;
 
-   procedure Remove(db : in out VariableStore.Database;
-                    commandarray : in out VariableArray;
-                    var : in VariableStore.Variable) is
+   procedure Remove(var : in VariableStore.Variable) is
    begin
-      VariableStore.Remove(db, var);
-      Delete(commandarray, commandarray.Find_Index(var));
+      VariableStore.Remove(DB, var);
+      Delete(CommandArray, CommandArray.Find_Index(var));
    end Remove;
 
-   procedure List(db : in VariableStore.Database) is
+   procedure List is
    begin 
-      VariableStore.Print(db);
+      VariableStore.Print(DB);
    end List;
 
 end Calculator;
