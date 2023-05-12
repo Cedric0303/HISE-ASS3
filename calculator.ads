@@ -1,20 +1,14 @@
 with MyStringTokeniser;
 with VariableStore;
 with Ada.Containers.Vectors;
+with Ada.Strings.Bounded;    use Ada.Strings.Bounded;
 
 
-package Calculator is
 
-   package Variable_Vectors is new Ada.Containers.Vectors
-      (Index_Type => Positive,
-       Element_Type => VariableStore.Variable,
-       "=" => VariableStore.Equal);
-   subtype VariableArray is Variable_Vectors.Vector;
-   use all type VariableArray;
+package Calculator with SPARK_Mode is
+   MAX_COMMANDS : constant Natural := 1024;
 
-   --  Max_Commands : constant Natural := 1024;
-   --  type Index is range 1 .. Max_Commands;
-   --  type LastCommandsArray is array (Index) of VariableStore.Variable;
+   type command_record_array is array (1..MAX_COMMANDS) of VariableStore.Variable;
    
    procedure Init;
 
