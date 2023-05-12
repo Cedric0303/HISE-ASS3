@@ -1,4 +1,4 @@
-package lock is
+package Lock with SPARK_Mode is
 
    procedure Lock(s: in String);
 
@@ -8,4 +8,4 @@ package lock is
 
    private function CheckInvalidPIN(s : in String) return Boolean;
 
-end lock;
+end Lock;

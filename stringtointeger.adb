@@ -1,5 +1,5 @@
 
-package body StringToInteger with SPARK_MOde Is
+package body StringToInteger with SPARK_Mode Is
    function From_String(S : in String) return Integer is
       Result : Integer := 0;
       C : Integer;

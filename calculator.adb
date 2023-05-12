@@ -1,15 +1,14 @@
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Integer_Text_IO; use Ada.Integer_Text_IO;
-with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
-with Ada.Strings.Bounded;    use Ada.Strings.Bounded;
 with VariableStore;
 with StringToInteger;
 with IntegerToString;
 
 package body Calculator is
    DB : VariableStore.Database;
-   CA : command_record_array;
-   num_CA : Natural := 1;
+   CA : CommandArray;
+   NumCommands : Natural := 1;
+   Increment : Natural := 0;
    
    procedure Init is
    begin
@@ -40,21 +39,27 @@ package body Calculator is
          Remove(VariableStore.From_String(arg2));
       elsif arg1 = "list" then
          List;
+      else
+         Put_Line("Invalid command.");
       end if;
+      Put("commands left: ");
+      for I in 1..NumCommands - 1 loop
+         Put(VariableStore.To_String(CA(I)));
+         Put(" ");
+      end loop;
       Put_Line("");
-      Put("command num: ");Put_Line(IntegerToString.To_String(num_CA - 1));
    end Process;
 
    procedure Plus is
    begin
       declare
-         lastcommand : VariableStore.Variable := CA(num_CA - 1);
-         lastlastcommand : VariableStore.Variable := CA(num_CA - 2);
+         lastcommand : VariableStore.Variable := CA(NumCommands - 1);
+         lastlastcommand : VariableStore.Variable := CA(NumCommands - 2);
          val1 : Integer;
          val2 : Integer;
-         var : VariableStore.Variable := VariableStore.From_String("plus" & IntegerToString.To_String(Integer(VariableStore.Length(DB))));
+         var : VariableStore.Variable := VariableStore.From_String(IntegerToString.To_String(Increment));
       begin
-         num_CA := num_CA - 2;
+         NumCommands := NumCommands - 2;
 
          val1 := VariableStore.Get(DB, lastlastcommand);
          val2 := VariableStore.Get(DB, lastcommand);
@@ -64,21 +69,23 @@ package body Calculator is
 
          VariableStore.Put(DB, var, val1 + val2);
 
-         CA(num_CA) := var;
-         num_CA := num_CA + 1;
+         CA(NumCommands) := var;
+         NumCommands := NumCommands + 1;
+
+         Increment := Increment + 1;
       end;
    end Plus;
 
    procedure Minus is
    begin
       declare
-         lastcommand : VariableStore.Variable := CA(num_CA - 1);
-         lastlastcommand : VariableStore.Variable := CA(num_CA - 2);
+         lastcommand : VariableStore.Variable := CA(NumCommands - 1);
+         lastlastcommand : VariableStore.Variable := CA(NumCommands - 2);
          val1 : Integer;
          val2 : Integer;
-         var : VariableStore.Variable := VariableStore.From_String("mins" & IntegerToString.To_String(Integer(VariableStore.Length(DB))));
+         var : VariableStore.Variable := VariableStore.From_String(IntegerToString.To_String(Increment));
       begin
-         num_CA := num_CA - 2;
+         NumCommands := NumCommands - 2;
 
          val1 := VariableStore.Get(DB, lastlastcommand);
          val2 := VariableStore.Get(DB, lastcommand);
@@ -88,21 +95,23 @@ package body Calculator is
 
          VariableStore.Put(DB, var, val1 - val2);
 
-         CA(num_CA) := var;
-         num_CA := num_CA + 1;
+         CA(NumCommands) := var;
+         NumCommands := NumCommands + 1;
+
+         Increment := Increment + 1;
       end;
    end Minus;
 
    procedure Multiply is
    begin
       declare
-         lastcommand : VariableStore.Variable := CA(num_CA - 1);
-         lastlastcommand : VariableStore.Variable := CA(num_CA - 2);
+         lastcommand : VariableStore.Variable := CA(NumCommands - 1);
+         lastlastcommand : VariableStore.Variable := CA(NumCommands - 2);
          val1 : Integer;
          val2 : Integer;
-         var : VariableStore.Variable := VariableStore.From_String("mult" & IntegerToString.To_String(Integer(VariableStore.Length(DB))));
+         var : VariableStore.Variable := VariableStore.From_String(IntegerToString.To_String(Increment));
       begin
-         num_CA := num_CA - 2;
+         NumCommands := NumCommands - 2;
 
          val1 := VariableStore.Get(DB, lastlastcommand);
          val2 := VariableStore.Get(DB, lastcommand);
@@ -112,21 +121,23 @@ package body Calculator is
 
          VariableStore.Put(DB, var, val1 * val2);
 
-         CA(num_CA) := var;
-         num_CA := num_CA + 1;
+         CA(NumCommands) := var;
+         NumCommands := NumCommands + 1;
+
+         Increment := Increment + 1;
       end;
    end Multiply;
 
    procedure Divide is
    begin
       declare
-         lastcommand : VariableStore.Variable := CA(num_CA - 1);
-         lastlastcommand : VariableStore.Variable := CA(num_CA - 2);
+         lastcommand : VariableStore.Variable := CA(NumCommands - 1);
+         lastlastcommand : VariableStore.Variable := CA(NumCommands - 2);
          val1 : Integer;
          val2 : Integer;
-         var : VariableStore.Variable := VariableStore.From_String("divd" & IntegerToString.To_String(Integer(VariableStore.Length(DB))));
+         var : VariableStore.Variable := VariableStore.From_String(IntegerToString.To_String(Increment));
       begin
-         num_CA := num_CA - 2;
+         NumCommands := NumCommands - 2;
 
          val1 := VariableStore.Get(DB, lastlastcommand);
          val2 := VariableStore.Get(DB, lastcommand);
@@ -136,29 +147,35 @@ package body Calculator is
 
          VariableStore.Put(DB, var, val1 / val2);
 
-         CA(num_CA) := var;
-         num_CA := num_CA + 1;
+         CA(NumCommands) := var;
+         NumCommands := NumCommands + 1;
+
+         Increment := Increment + 1;
       end;
    end Divide;
 
    procedure Push(value : in Integer) is
    begin
       declare
-         var : VariableStore.Variable := VariableStore.From_String("push" & IntegerToString.To_String(Integer(VariableStore.Length(DB))));
+         var : VariableStore.Variable := VariableStore.From_String(IntegerToString.To_String(Increment));
       begin
          VariableStore.Put(DB, var, value);
-         CA(num_CA) := var;
-         num_CA := num_CA + 1;
+
+         CA(NumCommands) := var;
+         NumCommands := NumCommands + 1;
+
+         Increment := Increment + 1;
       end;
    end Push;
    
    procedure Pop is
    begin
       declare
-         lastcommand : VariableStore.Variable := CA(num_CA - 1);
+         lastcommand : VariableStore.Variable := CA(NumCommands - 1);
       begin
          VariableStore.Remove(DB, lastcommand);
-         num_CA := num_CA - 1;
+
+         NumCommands := NumCommands - 1;
       end;
    end Pop;
 
@@ -166,25 +183,28 @@ package body Calculator is
    begin
       declare
          value : Integer := VariableStore.Get(DB, var);
-         new_var : VariableStore.Variable := VariableStore.From_String("load" & IntegerToString.To_String(Integer(VariableStore.Length(DB))));
+         new_var : VariableStore.Variable := VariableStore.From_String(IntegerToString.To_String(Increment));
       begin
          VariableStore.Put(DB, new_var, value);
-         CA(num_CA) := new_var;
-         num_CA := num_CA + 1;
+
+         CA(NumCommands) := new_var;
+         NumCommands := NumCommands + 1;
+
+         Increment := Increment + 1;
       end;
    end Load;
    
    procedure Store(var : in VariableStore.Variable) is
    begin
       declare
-         lastcommand : VariableStore.Variable :=  CA(num_CA - 1);
+         lastcommand : VariableStore.Variable :=  CA(NumCommands - 1);
          value : Integer := VariableStore.Get(db, lastcommand);
       begin
-         num_CA := num_CA - 1;
+         NumCommands := NumCommands - 1;
          VariableStore.Remove(DB, lastcommand);
          VariableStore.Put(DB, var, value);
-         CA(num_CA) := var;
-         num_CA := num_CA + 1;
+         CA(NumCommands) := var;
+         NumCommands := NumCommands + 1;
       end;
    end Store;
 
@@ -194,15 +214,15 @@ package body Calculator is
          found : Boolean := false;
       begin
          VariableStore.Remove(DB, var);
-         for I in 1..num_CA - 1 loop
+         for I in 1..NumCommands - 1 loop
             if not found and VariableStore.Equal(CA(I), var) then
                found := True;
             end if;
-            if found and I < num_CA - 2 then
+            if found and I < NumCommands - 1 then
                CA(I) := CA(I + 1);
             end if;
          end loop;
-         num_CA := num_CA - 1;
+         NumCommands := NumCommands - 1;
       end;
    end Remove;
 

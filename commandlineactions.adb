@@ -15,7 +15,9 @@ package body CommandLineActions is
       end if;
    end PutState;
 
-   procedure ProcessLine(T : in out MyStringTokeniser.TokenArray; command : out Unbounded_String; arg : out Unbounded_String) is
+   procedure ProcessLine(T : in out MyStringTokeniser.TokenArray; 
+                         command : out Unbounded_String; 
+                         arg : out Unbounded_String) is
    package Lines is new MyString(Max_MyString_Length => 2048);
    S  : Lines.MyString;
    NumTokens : Natural;
@@ -32,7 +34,6 @@ package body CommandLineActions is
          arg := Null_Unbounded_String;
       else
          Put_Line("Invalid command.");
-         return;
       end if;
    end ProcessLine;
 

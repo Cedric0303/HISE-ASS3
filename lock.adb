@@ -1,7 +1,7 @@
 with PIN;
 with Ada.Text_IO; use Ada.Text_IO;
 
-package body lock is
+package body Lock is
    Locked : Boolean := True;
    CurrentPIN : PIN.PIN;
 
@@ -52,4 +52,4 @@ package body lock is
       return False;
    end CheckInvalidPIN;
 
-end lock;
+end Lock;

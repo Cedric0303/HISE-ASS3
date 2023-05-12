@@ -1,14 +1,10 @@
 with MyStringTokeniser;
 with VariableStore;
-with Ada.Containers.Vectors;
-with Ada.Strings.Bounded;    use Ada.Strings.Bounded;
-
-
 
 package Calculator with SPARK_Mode is
    MAX_COMMANDS : constant Natural := 1024;
 
-   type command_record_array is array (1..MAX_COMMANDS) of VariableStore.Variable;
+   type CommandArray is array (1..MAX_COMMANDS) of VariableStore.Variable;
    
    procedure Init;
 
