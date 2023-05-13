@@ -3,31 +3,47 @@ with VariableStore;
 
 package Calculator with SPARK_Mode is
    MAX_COMMANDS : constant Natural := 1024;
-
    type CommandArray is array (1..MAX_COMMANDS) of VariableStore.Variable;
+   use type CommandArray;
    
-   procedure Init;
+   NumCommands : Natural := 1;
+   Increment : Natural := 0;
 
-   procedure Process(arg1 : in String; arg2 : in String);
+   procedure Process(DB : in out VariableStore.Database;
+                     CA : in out CommandArray;
+                     arg1 : in String; 
+                     arg2 : in String);
    
-   procedure Plus;
+   procedure Plus(DB : in out VariableStore.Database;
+                  CA : in out CommandArray);
 
-   procedure Minus;
+   procedure Minus(DB : in out VariableStore.Database;
+                   CA : in out CommandArray);
    
-   procedure Multiply;
+   procedure Multiply(DB : in out VariableStore.Database;
+                      CA : in out CommandArray);
 
-   procedure Divide;
+   procedure Divide(DB : in out VariableStore.Database;
+                    CA : in out CommandArray);
 
-   procedure Push(value : in Integer);
+   procedure Push(DB : in out VariableStore.Database;
+                  CA : in out CommandArray;
+                  value : in Integer);
 
-   procedure Pop;
+   procedure Pop(DB : in out VariableStore.Database;
+                 CA : in out CommandArray);
 
-   procedure Load(var : VariableStore.Variable);
+   procedure Load(DB : in out VariableStore.Database;
+                  CA : in out CommandArray;
+                  var : VariableStore.Variable);
    
-   procedure Store(var : in VariableStore.Variable);
+   procedure Store(DB : in out VariableStore.Database;
+                   CA : in out CommandArray;
+                   var : in VariableStore.Variable);
    
-   procedure Remove(var : in VariableStore.Variable);
+   procedure Remove(DB : in out VariableStore.Database;
+                    CA : in out CommandArray;
+                    var : in VariableStore.Variable);
 
-   procedure List;
-   
+   procedure List(DB : in out VariableStore.Database);
 end Calculator;

@@ -1,11 +1,10 @@
 with PIN;
 with Ada.Text_IO; use Ada.Text_IO;
 
-package body Lock is
+package body Lock with SPARK_Mode is
    Locked : Boolean := True;
-   CurrentPIN : PIN.PIN;
 
-   procedure Lock(s: in String) is
+   procedure Lock(CurrentPIN: out PIN.PIN; s: in String) is
    begin
       if CheckInvalidPIN(s) then
          return;
@@ -13,10 +12,10 @@ package body Lock is
 
       CurrentPIN := PIN.From_String(s);
       Locked := True;
-
    end Lock;
 
-   procedure Unlock(s: in String) is
+   procedure Unlock(CurrentPIN: in PIN.PIN;
+                    s: in String) is
    begin
       if CheckInvalidPIN(s) then
          return;

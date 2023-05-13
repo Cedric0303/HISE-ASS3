@@ -6,6 +6,7 @@ package CommandLineActions is
 
    procedure PutState(locked : in Boolean);
 
-   procedure ProcessLine(T : in out MyStringTokeniser.TokenArray; command : out Unbounded_String; arg : out Unbounded_String);
+   procedure ProcessLine(command : out Unbounded_String;
+                         arg : out Unbounded_String);
 
 end CommandLineActions;
