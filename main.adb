@@ -38,7 +38,34 @@ begin
       elsif not Lock.IsLocked and To_String(TokStr1) = "lock" then
          Lock.Lock(CurrentPIN, To_String(TokStr2));
       elsif not Lock.IsLocked then
-         Calculator.Process(DB, CA, To_String(TokStr1), To_String(TokStr2));
+         declare
+            arg1 : String := To_String(TokStr1);
+            arg2 : String := To_String(TokStr2);
+         begin
+            if arg1 = "+" then
+               Calculator.Plus(DB, CA);
+            elsif arg1 = "-" then
+               Calculator.Minus(DB, CA);
+            elsif arg1 = "*" then
+               Calculator.Multiply(DB, CA);
+            elsif arg1 = "/" then
+               Calculator.Divide(DB, CA);
+            elsif arg1 = "push" then
+               Calculator.Push(DB, CA, StringToInteger.From_String(arg2));
+            elsif arg1 = "pop" then
+               Calculator.Pop(DB, CA);
+            elsif arg1 = "load" then
+               Calculator.Load(DB, CA, VariableStore.From_String(arg2));
+            elsif arg1 = "store" then
+               Calculator.Store(DB, CA, VariableStore.From_String(arg2));
+            elsif arg1 = "remove" then
+               Calculator.Remove(DB, CA, VariableStore.From_String(arg2));
+            elsif arg1 = "list" then
+               Calculator.List(DB);
+            else
+               Put_Line("Invalid command.");
+            end if;
+         end;
       end if;
    end loop;
 end Main;

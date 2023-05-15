@@ -1,49 +1,12 @@
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Integer_Text_IO; use Ada.Integer_Text_IO;
+with Ada.Containers; use Ada.Containers;
 with VariableStore;
 with StringToInteger;
 with IntegerToString;
 
 package body Calculator with SPARK_Mode is
    
-   procedure Process(DB : in out VariableStore.Database;
-                     CA : in out CommandArray;
-                     arg1 : in String; 
-                     arg2 : in String) is
-   begin
-      --  Put(Integer (VariableStore.Length(DB)));Put_Line("");
-      --  Put(arg1);Put(":");Put_Line(arg2);
-      if arg1 = "+" then
-         Plus(DB, CA);
-      elsif arg1 = "-" then
-         Minus(DB, CA);
-      elsif arg1 = "*" then
-         Multiply(DB, CA);
-      elsif arg1 = "/" then
-         Divide(DB, CA);
-      elsif arg1 = "push" then
-         Push(DB, CA, StringToInteger.From_String(arg2));
-      elsif arg1 = "pop" then
-         Pop(DB, CA);
-      elsif arg1 = "load" then
-         Load(DB, CA, VariableStore.From_String(arg2));
-      elsif arg1 = "store" then
-         Store(DB, CA, VariableStore.From_String(arg2));
-      elsif arg1 = "remove" then
-         Remove(DB, CA, VariableStore.From_String(arg2));
-      elsif arg1 = "list" then
-         List(DB);
-      else
-         Put_Line("Invalid command.");
-      end if;
-      Put("commands left: [");
-      for I in 1..NumCommands - 1 loop
-         Put(VariableStore.To_String(CA(I)));
-         Put(" ");
-      end loop;
-      Put_Line("]");
-   end Process;
-
    procedure Plus(DB : in out VariableStore.Database;
                   CA : in out CommandArray) is
    begin
@@ -55,19 +18,28 @@ package body Calculator with SPARK_Mode is
          var : VariableStore.Variable := VariableStore.From_String(IntegerToString.To_String(Increment));
       begin
          NumCommands := NumCommands - 2;
+         if VariableStore.Has_Variable(DB, lastcommand) then
+            VariableStore.Remove(DB, lastcommand);
+         end if;
+         if VariableStore.Has_Variable(DB, lastlastcommand) then
+            VariableStore.Remove(DB, lastlastcommand);
+         end if;
 
-         VariableStore.Remove(DB, lastcommand);
-         VariableStore.Remove(DB, lastlastcommand);
-
-         VariableStore.Put(DB, var, val1 + val2);
-
+         if VariableStore.Length(DB) < VariableStore.Max_Entries or 
+           VariableStore.Has_Variable(DB, var) then
+            if ((val1 >= 0 and then val2 <= Integer'Last - val1) or else 
+                  (val1 < 0 and then val2 >= Integer'First - val1))  then
+               VariableStore.Put(DB, var, val1 + val2);
+            end if;
+         end if;
+         
          CA(NumCommands) := var;
          NumCommands := NumCommands + 1;
 
          Increment := Increment + 1;
       end;
    end Plus;
-
+  
    procedure Minus(DB : in out VariableStore.Database;
                   CA : in out CommandArray) is
    begin
@@ -79,19 +51,28 @@ package body Calculator with SPARK_Mode is
          var : VariableStore.Variable := VariableStore.From_String(IntegerToString.To_String(Increment));
       begin
          NumCommands := NumCommands - 2;
+         if VariableStore.Has_Variable(DB, lastcommand) then
+            VariableStore.Remove(DB, lastcommand);
+         end if;
+         if VariableStore.Has_Variable(DB, lastlastcommand) then
+            VariableStore.Remove(DB, lastlastcommand);
+         end if;
 
-         VariableStore.Remove(DB, lastcommand);
-         VariableStore.Remove(DB, lastlastcommand);
-
-         VariableStore.Put(DB, var, val1 - val2);
-
+         if VariableStore.Length(DB) < VariableStore.Max_Entries or 
+           VariableStore.Has_Variable(DB, var) then
+            if ((val1 >= 0 and then val2 >= Integer'Last - val1) or else 
+                  (val1 < 0 and then val2 <= Integer'First - val1))  then
+               VariableStore.Put(DB, var, val1 - val2);
+            end if;
+         end if;
+         
          CA(NumCommands) := var;
          NumCommands := NumCommands + 1;
 
          Increment := Increment + 1;
       end;
    end Minus;
-
+   
    procedure Multiply(DB : in out VariableStore.Database;
                       CA : in out CommandArray) is
    begin
@@ -103,19 +84,28 @@ package body Calculator with SPARK_Mode is
          var : VariableStore.Variable := VariableStore.From_String(IntegerToString.To_String(Increment));
       begin
          NumCommands := NumCommands - 2;
+         if VariableStore.Has_Variable(DB, lastcommand) then
+            VariableStore.Remove(DB, lastcommand);
+         end if;
+         if VariableStore.Has_Variable(DB, lastlastcommand) then
+            VariableStore.Remove(DB, lastlastcommand);
+         end if;
 
-         VariableStore.Remove(DB, lastcommand);
-         VariableStore.Remove(DB, lastlastcommand);
-
-         VariableStore.Put(DB, var, val1 * val2);
-
+         if VariableStore.Length(DB) < VariableStore.Max_Entries or 
+           VariableStore.Has_Variable(DB, var) then
+            if (((val1 < 2**15 and val2 < ((2**16) - 1)) and (val1 > -2**15 and val2 > -2**16)) or else 
+                  ((val1 < ((2**16) - 1) and val2 < 2**15) and (val1 > -2**16 and val2 > -2**15))) then
+               VariableStore.Put(DB, var, val1 * val2);
+            end if;
+         end if;
+         
          CA(NumCommands) := var;
          NumCommands := NumCommands + 1;
 
          Increment := Increment + 1;
       end;
    end Multiply;
-
+   
    procedure Divide(DB : in out VariableStore.Database;
                     CA : in out CommandArray) is
    begin
@@ -127,19 +117,27 @@ package body Calculator with SPARK_Mode is
          var : VariableStore.Variable := VariableStore.From_String(IntegerToString.To_String(Increment));
       begin
          NumCommands := NumCommands - 2;
+         if VariableStore.Has_Variable(DB, lastcommand) then
+            VariableStore.Remove(DB, lastcommand);
+         end if;
+         if VariableStore.Has_Variable(DB, lastlastcommand) then
+            VariableStore.Remove(DB, lastlastcommand);
+         end if;
 
-         VariableStore.Remove(DB, lastcommand);
-         VariableStore.Remove(DB, lastlastcommand);
-
-         VariableStore.Put(DB, var, val1 / val2);
-
+         if VariableStore.Length(DB) < VariableStore.Max_Entries or 
+           VariableStore.Has_Variable(DB, var) then
+            if (val2 /= 0 and not (val1 = Integer'First and val2 = -1)) then
+               VariableStore.Put(DB, var, val1 / val2);
+            end if;
+         end if;
+         
          CA(NumCommands) := var;
          NumCommands := NumCommands + 1;
 
          Increment := Increment + 1;
       end;
    end Divide;
-
+   
    procedure Push(DB : in out VariableStore.Database;
                   CA : in out CommandArray;
                   value : in Integer) is
@@ -147,40 +145,46 @@ package body Calculator with SPARK_Mode is
       declare
          var : VariableStore.Variable := VariableStore.From_String(IntegerToString.To_String(Increment));
       begin
-         VariableStore.Put(DB, var, value);
-
+         if VariableStore.Length(DB) < VariableStore.Max_Entries or 
+           VariableStore.Has_Variable(DB, var) then
+            VariableStore.Put(DB, var, value);
+         end if;
+            
          CA(NumCommands) := var;
          NumCommands := NumCommands + 1;
-
+   
          Increment := Increment + 1;
       end;
    end Push;
    
    procedure Pop(DB : in out VariableStore.Database;
-                 CA : in out CommandArray) is
+                 CA : in CommandArray) is
    begin
       declare
          lastcommand : VariableStore.Variable := CA(NumCommands - 1);
       begin
          VariableStore.Remove(DB, lastcommand);
-
+   
          NumCommands := NumCommands - 1;
       end;
    end Pop;
-
+   
    procedure Load(DB : in out VariableStore.Database;
                   CA : in out CommandArray;
-                  var : VariableStore.Variable) is
+                  old_var : VariableStore.Variable) is
    begin
       declare
-         value : Integer := VariableStore.Get(DB, var);
+         value : Integer := VariableStore.Get(DB, old_var);
          new_var : VariableStore.Variable := VariableStore.From_String(IntegerToString.To_String(Increment));
       begin
-         VariableStore.Put(DB, new_var, value);
-
+         if VariableStore.Length(DB) < VariableStore.Max_Entries or 
+           VariableStore.Has_Variable(DB, new_var) then
+            VariableStore.Put(DB, new_var, value);
+         end if;
+   
          CA(NumCommands) := new_var;
          NumCommands := NumCommands + 1;
-
+   
          Increment := Increment + 1;
       end;
    end Load;
@@ -194,15 +198,18 @@ package body Calculator with SPARK_Mode is
          value : Integer := VariableStore.Get(DB, lastcommand);
       begin
          NumCommands := NumCommands - 1;
-
+   
          VariableStore.Remove(DB, lastcommand);
-         VariableStore.Put(DB, var, value);
-
+         if VariableStore.Length(DB) < VariableStore.Max_Entries or 
+           VariableStore.Has_Variable(DB, var) then
+            VariableStore.Put(DB, var, value);
+         end if;
+   
          CA(NumCommands) := var;
          NumCommands := NumCommands + 1;
       end;
    end Store;
-
+   
    procedure Remove(DB : in out VariableStore.Database;
                     CA : in out CommandArray;
                     var : in VariableStore.Variable) is
@@ -223,7 +230,7 @@ package body Calculator with SPARK_Mode is
       end;
    end Remove;
 
-   procedure List(DB : in out VariableStore.Database) is
+   procedure List(DB : in VariableStore.Database) is
    begin 
       VariableStore.Print(DB);
    end List;
