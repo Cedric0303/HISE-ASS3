@@ -4,7 +4,7 @@ with MyStringTokeniser;
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
-package body CommandLineActions is
+package body CommandLineActions with SPARK_Mode is
 
    procedure PutState(locked : in Boolean) is
    begin

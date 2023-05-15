@@ -2,7 +2,7 @@ with MyStringTokeniser;
 
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
-package CommandLineActions is
+package CommandLineActions with SPARK_Mode is
 
    procedure PutState(locked : in Boolean);
 
