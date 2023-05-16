@@ -25,6 +25,9 @@ package body CommandLineActions with SPARK_Mode is
       declare
          T : MyStringTokeniser.TokenArray(1..5) := (others => (Start => 1, Length => 0));
       begin
+         command := Null_Unbounded_String;
+         arg := Null_Unbounded_String;
+         
          Lines.Get_Line(S);
          MyStringTokeniser.Tokenise(Lines.To_String(S), T, NumTokens);
 
@@ -33,7 +36,6 @@ package body CommandLineActions with SPARK_Mode is
             arg := To_Unbounded_String(Lines.To_String(Lines.Substring(S, T(2).Start, T(2).Start+T(2).Length-1)));
          elsif NumTokens = 1 then
             command := To_Unbounded_String(Lines.To_String(Lines.Substring(S, T(1).Start, T(1).Start+T(1).Length-1)));
-            arg := Null_Unbounded_String;
          else
             Put_Line("Invalid command.");
          end if;
