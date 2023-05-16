@@ -1,14 +1,24 @@
 with PIN;
-with Ada.Text_IO; use Ada.Text_IO;
 
 package body Lock with SPARK_Mode is
    Locked : Boolean := True;
 
    procedure Lock(CurrentPIN: out PIN.PIN; s: in String) is
    begin
-      if CheckInvalidPIN(s) then
+      CurrentPIN := PIN.From_String("0000");
+
+      if s'Length /= 4 then
          return;
       end if;
+
+      for I in s'Range loop
+         if s(I) < '0' or s(I) > '9' then
+            return;
+         end if;
+
+         pragma Loop_Invariant (for all J in s'First..I => (s(J) >= '0' and s(J) <= '9'));
+
+      end loop;
 
       CurrentPIN := PIN.From_String(s);
       Locked := True;
@@ -17,10 +27,19 @@ package body Lock with SPARK_Mode is
    procedure Unlock(CurrentPIN: in PIN.PIN;
                     s: in String) is
    begin
-      if CheckInvalidPIN(s) then
+      if s'Length /= 4 then
          return;
       end if;
-      
+
+      for I in s'Range loop
+         if s(I) < '0' or s(I) > '9' then
+            return;
+         end if;
+
+         pragma Loop_Invariant (for all J in s'First..I => (s(J) >= '0' and s(J) <= '9'));
+
+      end loop;
+
       if PIN."="(CurrentPIN, PIN.From_String(s)) then
          Locked := False;
       end if;
@@ -30,25 +49,5 @@ package body Lock with SPARK_Mode is
    begin
       return Locked;
    end IsLocked;
-
-   function CheckInvalidPIN(s: in String) return Boolean is
-   begin
-      if s'Length /= 4 then
-         Put_Line("Invalid PIN.");
-         return True;
-      end if;
-
-      for I in s'Range loop
-         if s(I) < '0' or s(I) > '9' then
-            Put_Line("Invalid PIN.");
-            return True;
-         end if;
-
-         pragma Loop_Invariant (for all J in s'First..I => (s(J) >= '0' and s(J) <= '9'));
-
-      end loop;
-
-      return False;
-   end CheckInvalidPIN;
 
 end Lock;
