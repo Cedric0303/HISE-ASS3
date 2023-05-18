@@ -12,16 +12,14 @@ with CommandLineActions;
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Integer_Text_IO; use Ada.Integer_Text_IO;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
+with Ada.Containers; use Ada.Containers;
 
 procedure Main is
    CurrentPIN : PIN.PIN;
    TokStr1 : Unbounded_String;
    TokStr2 : Unbounded_String;
-   DB : VariableStore.Database;
-   CA : Calculator.CommandArray := (others => (VariableStore.From_String("")));
-
-   NumCommands : Natural := 1;
-   Increment : Natural := 0;
+   ValueStack : VariableStore.Database;
+   VariableStack : VariableStore.Database;
 
 begin
    if MyCommandLine.Argument_Count /= 1 then
@@ -30,10 +28,10 @@ begin
    end if;
 
    Lock.Lock(CurrentPIN, MyCommandLine.Argument(1));
-   VariableStore.Init(DB);
+   VariableStore.Init(ValueStack);
+   VariableStore.Init(VariableStack);
 
-   while NumCommands in CA'Range and
-     Increment < Calculator.MAX_COMMANDS - 1 loop
+   while True loop
 
       CommandLineActions.PutState(Lock.IsLocked);
       CommandLineActions.ProcessLine(TokStr1, TokStr2);
@@ -50,55 +48,68 @@ begin
             arg2 : String := To_String(TokStr2);
          begin
             if arg1 = "+" and
-              ((NumCommands > CA'First + 1 and NumCommands <= CA'Last) and then
-              (VariableStore.Has_Variable(DB, CA(NumCommands - 2)) and
-              VariableStore.Has_Variable(DB, CA(NumCommands - 1)))) then
-               Calculator.Plus(DB, CA, NumCommands, Increment);
+              Integer(VariableStore.Length(ValueStack)) > 2 and
+              VariableStore.Has_Variable(ValueStack, VariableStore.From_String(Integer(Integer(VariableStore.Length(ValueStack)) - 2)'Image)) and
+              VariableStore.Has_Variable(ValueStack, VariableStore.From_String(Integer(Integer(VariableStore.Length(ValueStack)) - 1)'Image))
+            then
+               Calculator.Plus(ValueStack);
 
             elsif arg1 = "-" and
-              ((NumCommands > CA'First + 1 and NumCommands <= CA'Last) and then
-              (VariableStore.Has_Variable(DB, CA(NumCommands - 2)) and
-              VariableStore.Has_Variable(DB, CA(NumCommands - 1)))) then
-               Calculator.Minus(DB, CA, NumCommands, Increment);
+              Integer(VariableStore.Length(ValueStack)) > 2 and
+              VariableStore.Has_Variable(ValueStack, VariableStore.From_String(Integer(Integer(VariableStore.Length(ValueStack)) - 2)'Image)) and
+              VariableStore.Has_Variable(ValueStack, VariableStore.From_String(Integer(Integer(VariableStore.Length(ValueStack)) - 1)'Image))
+            then
+               Calculator.Minus(ValueStack);
 
             elsif arg1 = "*" and
-              ((NumCommands > CA'First + 1 and NumCommands <= CA'Last) and then
-              (VariableStore.Has_Variable(DB, CA(NumCommands - 2)) and
-              VariableStore.Has_Variable(DB, CA(NumCommands - 1)))) then
-               Calculator.Multiply(DB, CA, NumCommands, Increment);
+              Integer(VariableStore.Length(ValueStack)) > 2 and
+              VariableStore.Has_Variable(ValueStack, VariableStore.From_String(Integer(Integer(VariableStore.Length(ValueStack)) - 2)'Image)) and
+              VariableStore.Has_Variable(ValueStack, VariableStore.From_String(Integer(Integer(VariableStore.Length(ValueStack)) - 1)'Image))
+            then
+               Calculator.Multiply(ValueStack);
 
             elsif arg1 = "/" and
-              ((NumCommands > CA'First + 1 and NumCommands <= CA'Last) and then
-              (VariableStore.Has_Variable(DB, CA(NumCommands - 2)) and
-              VariableStore.Has_Variable(DB, CA(NumCommands - 1)))) then
-               Calculator.Divide(DB, CA, NumCommands, Increment);
+              Integer(VariableStore.Length(ValueStack)) > 2 and
+              VariableStore.Has_Variable(ValueStack, VariableStore.From_String(Integer(Integer(VariableStore.Length(ValueStack)) - 2)'Image)) and
+              VariableStore.Has_Variable(ValueStack, VariableStore.From_String(Integer(Integer(VariableStore.Length(ValueStack)) - 1)'Image))
+            then
+               Calculator.Divide(ValueStack);
 
-            elsif arg1 = "push" and NumCommands < CA'Last - 1 then
-               Calculator.Push(DB, CA, StringToInteger.From_String(arg2), NumCommands, Increment);
+            elsif arg1 = "push" and
+              (VariableStore.Length(ValueStack) < VariableStore.Max_Entries or
+              VariableStore.Has_Variable(ValueStack, VariableStore.From_String(Integer(Integer(VariableStore.Length(ValueStack)))'Image)))
+            then
+               Calculator.Push(ValueStack, StringToInteger.From_String(arg2));
 
             elsif arg1 = "pop" and
-              ((NumCommands > CA'First and NumCommands < CA'Last - 1) and then
-              VariableStore.Has_Variable(DB, CA(NumCommands - 1))) then
-               Calculator.Pop(DB, CA, NumCommands);
+              VariableStore.Has_Variable(ValueStack, VariableStore.From_String(Integer(Integer(VariableStore.Length(ValueStack)) - 1)'Image))
+            then
+               Calculator.Pop(ValueStack);
 
-            elsif arg1 = "load" and NumCommands < CA'Last - 1 and
+            elsif arg1 = "load" and
               (arg2'Length <= VariableStore.Max_Variable_Length and then
-              VariableStore.Has_Variable(DB, VariableStore.From_String(arg2))) then
-               Calculator.Load(DB, CA, VariableStore.From_String(arg2), NumCommands, Increment);
+              (VariableStore.Has_Variable(VariableStack, VariableStore.From_String(arg2)) and
+              (VariableStore.Length(ValueStack) < VariableStore.Max_Entries or
+              VariableStore.Has_Variable(ValueStack, VariableStore.From_String(Integer(Integer(VariableStore.Length(ValueStack)))'Image)))))
+            then
+               Calculator.Load(ValueStack, VariableStack, VariableStore.From_String(arg2));
 
             elsif arg1 = "store" and
-              (NumCommands > CA'First + 1 and then
-              VariableStore.Has_Variable(DB, CA(NumCommands - 1))) and
-              arg2'Length <= VariableStore.Max_Variable_Length then
-               Calculator.Store(DB, CA, VariableStore.From_String(arg2), NumCommands);
+              ((arg2'Length <= VariableStore.Max_Variable_Length and
+              VariableStore.Has_Variable(ValueStack, VariableStore.From_String(Integer(Integer(VariableStore.Length(ValueStack)) - 1)'Image))) and then
+              (VariableStore.Length(VariableStack) < VariableStore.Max_Entries or VariableStore.Has_Variable(VariableStack, VariableStore.From_String(arg2))))
+            then
+               Calculator.Store(ValueStack, VariableStack, VariableStore.From_String(arg2));
 
-            elsif arg1 = "remove" and NumCommands > CA'First and
+            elsif arg1 = "remove" and
               (arg2'Length <= VariableStore.Max_Variable_Length and then
-              VariableStore.Has_Variable(DB, VariableStore.From_String(arg2))) then
-               Calculator.Remove(DB, CA, VariableStore.From_String(arg2), NumCommands);
+              VariableStore.Has_Variable(VariableStack, VariableStore.From_String(arg2)))
+            then
+               Calculator.Remove(VariableStack, VariableStore.From_String(arg2));
 
             elsif arg1 = "list" then
-               Calculator.List(DB);
+               Calculator.List(VariableStack);
+               Calculator.List(ValueStack);
 
             elsif arg1 = "exit" then
                exit;

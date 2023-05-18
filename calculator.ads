@@ -1,122 +1,68 @@
 with MyStringTokeniser;
 with VariableStore;
+with Ada.Containers; use Ada.Containers;
 
-package Calculator with SPARK_Mode is
-   MAX_COMMANDS : constant Natural := 1024;
-   type CommandArray is array (1..MAX_COMMANDS) of VariableStore.Variable;
-   use type CommandArray;
+package Calculator with SPARK_Mode is 
      
-   procedure Plus(DB : in out VariableStore.Database;
-                  CA : in out CommandArray;
-                  NumCommands : in out Natural;
-                  Increment : in out Natural) with
+   procedure Plus(ValueStack : in out VariableStore.Database) with
      Pre =>
-       ((NumCommands > CA'First + 1 and NumCommands <= CA'Last) and then
-       (VariableStore.Has_Variable(DB, CA(NumCommands - 2)) and
-       VariableStore.Has_Variable(DB, CA(NumCommands - 1)))) and
-       Increment < MAX_COMMANDS - 1,
-       Post =>
-         NumCommands in CA'Range and
-         Increment < MAX_COMMANDS;
+       Integer(VariableStore.Length(ValueStack)) > 2 and
+       VariableStore.Has_Variable(ValueStack, VariableStore.From_String(Integer(Integer(VariableStore.Length(ValueStack)) - 2)'Image)) and
+       VariableStore.Has_Variable(ValueStack, VariableStore.From_String(Integer(Integer(VariableStore.Length(ValueStack)) - 1)'Image));
          
-   procedure Minus(DB : in out VariableStore.Database;
-                   CA : in out CommandArray;
-                   NumCommands : in out Natural;
-                   Increment : in out Natural) with
+   procedure Minus(ValueStack : in out VariableStore.Database) with
      Pre =>
-       ((NumCommands > CA'First + 1 and NumCommands <= CA'Last) and then
-       (VariableStore.Has_Variable(DB, CA(NumCommands - 2)) and
-       VariableStore.Has_Variable(DB, CA(NumCommands - 1)))) and
-       Increment < MAX_COMMANDS - 1,
-       Post =>
-         NumCommands in CA'Range and
-         Increment < MAX_COMMANDS;
-   
-   procedure Multiply(DB : in out VariableStore.Database;
-                      CA : in out CommandArray;
-                      NumCommands : in out Natural;
-                      Increment : in out Natural) with
+       Integer(VariableStore.Length(ValueStack)) > 2 and
+       VariableStore.Has_Variable(ValueStack, VariableStore.From_String(Integer(Integer(VariableStore.Length(ValueStack)) - 2)'Image)) and
+       VariableStore.Has_Variable(ValueStack, VariableStore.From_String(Integer(Integer(VariableStore.Length(ValueStack)) - 1)'Image));
+
+   procedure Multiply(ValueStack : in out VariableStore.Database) with
      Pre =>
-       ((NumCommands > CA'First + 1 and NumCommands <= CA'Last) and then
-       (VariableStore.Has_Variable(DB, CA(NumCommands - 2)) and
-       VariableStore.Has_Variable(DB, CA(NumCommands - 1)))) and
-       Increment < MAX_COMMANDS - 1,
-       Post =>
-         NumCommands in CA'Range and
-         Increment < MAX_COMMANDS;
+       Integer(VariableStore.Length(ValueStack)) > 2 and
+       VariableStore.Has_Variable(ValueStack, VariableStore.From_String(Integer(Integer(VariableStore.Length(ValueStack)) - 2)'Image)) and
+       VariableStore.Has_Variable(ValueStack, VariableStore.From_String(Integer(Integer(VariableStore.Length(ValueStack)) - 1)'Image));
    
-   procedure Divide(DB : in out VariableStore.Database;
-                    CA : in out CommandArray;
-                    NumCommands : in out Natural;
-                    Increment : in out Natural) with
+   procedure Divide(ValueStack : in out VariableStore.Database) with
      Pre =>
-       ((NumCommands > CA'First + 1 and NumCommands <= CA'Last) and then
-       (VariableStore.Has_Variable(DB, CA(NumCommands - 2)) and
-       VariableStore.Has_Variable(DB, CA(NumCommands - 1)))) and
-       Increment < MAX_COMMANDS - 1,
-       Post =>
-         NumCommands in CA'Range and
-         Increment < MAX_COMMANDS;
+       Integer(VariableStore.Length(ValueStack)) > 2 and
+       VariableStore.Has_Variable(ValueStack, VariableStore.From_String(Integer(Integer(VariableStore.Length(ValueStack)) - 2)'Image)) and
+       VariableStore.Has_Variable(ValueStack, VariableStore.From_String(Integer(Integer(VariableStore.Length(ValueStack)) - 1)'Image));
    
-   procedure Push(DB : in out VariableStore.Database;
-                  CA : in out CommandArray;
-                  value : in Integer;
-                  NumCommands : in out Natural;
-                  Increment : in out Natural) with
+   procedure Push(ValueStack : in out VariableStore.Database;
+                  value : in Integer) with
+     Pre =>
+       VariableStore.Length(ValueStack) < VariableStore.Max_Entries or 
+       VariableStore.Has_Variable(ValueStack, VariableStore.From_String(Integer(Integer(VariableStore.Length(ValueStack)))'Image));
+   
+   procedure Pop(ValueStack : in out VariableStore.Database) with 
+     Pre =>
+       VariableStore.Has_Variable(ValueStack, VariableStore.From_String(Integer(Integer(VariableStore.Length(ValueStack)) - 1)'Image));
+       
+   procedure Load(ValueStack : in out VariableStore.Database;
+                  VariableStack : in VariableStore.Database;
+                  OldVar : in VariableStore.Variable) with
+     Pre =>
+       VariableStore.Has_Variable(VariableStack, OldVar) and
+       (VariableStore.Length(ValueStack) < VariableStore.Max_Entries or 
+       VariableStore.Has_Variable(ValueStack, VariableStore.From_String(Integer(Integer(VariableStore.Length(ValueStack)))'Image)));
+       
+   
+   procedure Store(ValueStack : in out VariableStore.Database;
+                   VariableStack : in out VariableStore.Database;
+                   var : in VariableStore.Variable) with
      Pre => 
-       NumCommands in CA'Range and
-       NumCommands < CA'Last - 1 and
-       Increment < MAX_COMMANDS - 1,
-       Post =>
-         NumCommands in CA'Range and
-         Increment < MAX_COMMANDS;
+       VariableStore.Has_Variable(ValueStack, 
+                                  VariableStore.From_String(Integer(Integer(VariableStore.Length(ValueStack)) - 1)'Image)) and
+       (VariableStore.Length(VariableStack) < VariableStore.Max_Entries or 
+       VariableStore.Has_Variable(VariableStack, var));
    
-   procedure Pop(DB : in out VariableStore.Database;
-                 CA : in CommandArray;
-                 NumCommands : in out Natural) with
-     Pre => 
-       (NumCommands > CA'First and NumCommands < CA'Last - 1) and then
-       (VariableStore.Has_Variable(DB, CA(NumCommands - 1))),
-       Post =>
-         NumCommands in CA'Range;
-   
-   procedure Load(DB : in out VariableStore.Database;
-                  CA : in out CommandArray;
-                  old_var : VariableStore.Variable;
-                  NumCommands : in out Natural;
-                  Increment : in out Natural) with
-     Pre => 
-       NumCommands in CA'Range and
-       VariableStore.Has_Variable(DB, old_var) and
-       NumCommands < CA'Last - 1 and
-       Increment < MAX_COMMANDS - 1,
-       Post =>
-         NumCommands in CA'Range and
-         Increment < MAX_COMMANDS;
-   
-   procedure Store(DB : in out VariableStore.Database;
-                   CA : in out CommandArray;
-                   var : in VariableStore.Variable;
-                   NumCommands : in out Natural) with
-     Pre => 
-       (NumCommands > CA'First + 1 and NumCommands - 1 < CA'Last) and then
-       VariableStore.Has_Variable(DB, CA(NumCommands - 1)),
-       Post =>
-         NumCommands in CA'Range;
-   
-   procedure Remove(DB : in out VariableStore.Database;
-                    CA : in out CommandArray;
-                    var : in VariableStore.Variable;
-                    NumCommands : in out Natural) with
-     Pre => 
-       NumCommands in CA'Range and
-       VariableStore.Has_Variable(DB, var) and
-       NumCommands > CA'First,
-       Post =>
-         NumCommands in CA'Range;
-   
+   procedure Remove(VariableStack : in out VariableStore.Database;
+                    var : in VariableStore.Variable) with
+     Pre =>
+       VariableStore.Has_Variable(VariableStack, var);
+
    pragma Warnings (Off, "has no effect");
-   procedure List(DB : in VariableStore.Database);
+   procedure List(VariableStack : in VariableStore.Database);
    pragma Warnings (On, "has no effect");
    
 end Calculator;
