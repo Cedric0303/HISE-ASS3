@@ -109,12 +109,13 @@ begin
 
             elsif arg1 = "list" then
                Calculator.List(VariableStack);
-               Calculator.List(ValueStack);
 
             elsif arg1 = "exit" then
                exit;
+
             else
                Put_Line("Invalid command.");
+               
             end if;
          end;
       end if;
