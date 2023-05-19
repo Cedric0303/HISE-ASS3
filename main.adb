@@ -27,6 +27,11 @@ begin
       return;
    end if;
 
+   if Lock.IsInvalidPIN(MyCommandLine.Argument(1)) then
+      Put_Line("Invalid PIN.");
+      return;
+   end if;
+
    Lock.Lock(CurrentPIN, MyCommandLine.Argument(1));
    VariableStore.Init(ValueStack);
    VariableStore.Init(VariableStack);
@@ -35,18 +40,30 @@ begin
 
       CommandLineActions.PutState(Lock.IsLocked);
       CommandLineActions.ProcessLine(TokStr1, TokStr2);
-
-      if Lock.IsLocked and To_String(TokStr1) = "unlock" then
-         Lock.Unlock(CurrentPIN, To_String(TokStr2));
-      elsif Lock.IsLocked and To_String(TokStr1) = "lock" then
-         Put_Line("Already locked.");
-      elsif not Lock.IsLocked and To_String(TokStr1) = "lock" then
-         Lock.Lock(CurrentPIN, To_String(TokStr2));
-      elsif not Lock.IsLocked then
-         declare
+      
+      declare
             arg1 : String := To_String(TokStr1);
             arg2 : String := To_String(TokStr2);
-         begin
+      begin
+
+         if Lock.IsLocked and arg1 = "unlock" then
+            if Lock.IsInvalidPIN(arg2) then
+               Put_Line("Invalid PIN.");
+               return;
+            end if;
+
+            Lock.Unlock(CurrentPIN, arg2);
+         elsif Lock.IsLocked and arg1 = "lock" then
+            Put_Line("Already locked.");
+         elsif not Lock.IsLocked and arg1 = "lock" then
+            if Lock.IsInvalidPIN(arg2) then
+               Put_Line("Invalid PIN.");
+               return;
+            end if;
+
+            Lock.Lock(CurrentPIN, arg2);
+         elsif not Lock.IsLocked then
+
             if arg1 = "+" and
               Integer(VariableStore.Length(ValueStack)) > 2 and
               VariableStore.Has_Variable(ValueStack, VariableStore.From_String(Integer(Integer(VariableStore.Length(ValueStack)) - 2)'Image)) and
@@ -76,7 +93,7 @@ begin
                Calculator.Divide(ValueStack);
 
             elsif arg1 = "push" and
-              (VariableStore.Length(ValueStack) < VariableStore.Max_Entries or
+              (VariableStore.Length(ValueStack) < 512 or
               VariableStore.Has_Variable(ValueStack, VariableStore.From_String(Integer(Integer(VariableStore.Length(ValueStack)))'Image)))
             then
                Calculator.Push(ValueStack, StringToInteger.From_String(arg2));
@@ -89,7 +106,7 @@ begin
             elsif arg1 = "load" and
               (arg2'Length <= VariableStore.Max_Variable_Length and then
               (VariableStore.Has_Variable(VariableStack, VariableStore.From_String(arg2)) and
-              (VariableStore.Length(ValueStack) < VariableStore.Max_Entries or
+              (VariableStore.Length(ValueStack) < 512 or
               VariableStore.Has_Variable(ValueStack, VariableStore.From_String(Integer(Integer(VariableStore.Length(ValueStack)))'Image)))))
             then
                Calculator.Load(ValueStack, VariableStack, VariableStore.From_String(arg2));
@@ -117,7 +134,7 @@ begin
                Put_Line("Invalid command.");
                
             end if;
-         end;
-      end if;
+         end if;
+      end;
    end loop;
 end Main;

@@ -8,4 +8,6 @@ package Lock with SPARK_Mode is
 
    function IsLocked return Boolean;
 
+   function IsInvalidPIN(s: in String) return Boolean;
+
 end Lock;
