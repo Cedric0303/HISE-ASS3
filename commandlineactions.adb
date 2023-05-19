@@ -15,10 +15,9 @@ package body CommandLineActions with SPARK_Mode is
       end if;
    end PutState;
 
-   procedure ProcessLine(command : out Unbounded_String; 
+   procedure ProcessLine(S : in String; command : out Unbounded_String; 
                          arg : out Unbounded_String) is
    package Lines is new MyString(Max_MyString_Length => 2048);
-   S  : Lines.MyString;
    NumTokens : Natural;
 
    begin
@@ -27,15 +26,18 @@ package body CommandLineActions with SPARK_Mode is
       begin
          command := Null_Unbounded_String;
          arg := Null_Unbounded_String;
+
+         if S'length > 2048 then
+            return;
+         end if;
          
-         Lines.Get_Line(S);
-         MyStringTokeniser.Tokenise(Lines.To_String(S), T, NumTokens);
+         MyStringTokeniser.Tokenise(S, T, NumTokens);
 
          if NumTokens = 2 then
-            command := To_Unbounded_String(Lines.To_String(Lines.Substring(S, T(1).Start, T(1).Start+T(1).Length-1)));
-            arg := To_Unbounded_String(Lines.To_String(Lines.Substring(S, T(2).Start, T(2).Start+T(2).Length-1)));
+            command := To_Unbounded_String(Lines.To_String(Lines.Substring(Lines.From_String(S), T(1).Start, T(1).Start+T(1).Length-1)));
+            arg := To_Unbounded_String(Lines.To_String(Lines.Substring(Lines.From_String(S), T(2).Start, T(2).Start+T(2).Length-1)));
          elsif NumTokens = 1 then
-            command := To_Unbounded_String(Lines.To_String(Lines.Substring(S, T(1).Start, T(1).Start+T(1).Length-1)));
+            command := To_Unbounded_String(Lines.To_String(Lines.Substring(Lines.From_String(S), T(1).Start, T(1).Start+T(1).Length-1)));
          else
             Put_Line("Invalid command.");
          end if;

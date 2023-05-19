@@ -8,6 +8,7 @@ with PIN;
 with Calculator;
 with Lock;
 with CommandLineActions;
+with MyString;
 
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Integer_Text_IO; use Ada.Integer_Text_IO;
@@ -15,6 +16,8 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Containers; use Ada.Containers;
 
 procedure Main is
+   package Lines is new MyString(Max_MyString_Length => 2048);
+   S : Lines.MyString;
    CurrentPIN : PIN.PIN;
    TokStr1 : Unbounded_String;
    TokStr2 : Unbounded_String;
@@ -39,7 +42,8 @@ begin
    while True loop
 
       CommandLineActions.PutState(Lock.IsLocked);
-      CommandLineActions.ProcessLine(TokStr1, TokStr2);
+      Lines.Get_Line(S);
+      CommandLineActions.ProcessLine(Lines.To_String(S), TokStr1, TokStr2);
       
       declare
             arg1 : String := To_String(TokStr1);
@@ -130,8 +134,13 @@ begin
             elsif arg1 = "exit" then
                exit;
 
+            elsif (arg1 = "store" or arg1 = "load" or arg1 = "remove") and arg2'Length > VariableStore.Max_Variable_Length then
+               Put_Line("Variable Name Too Long.");
+               return;
+
             else
                Put_Line("Invalid command.");
+               return;
                
             end if;
          end if;
