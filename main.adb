@@ -45,7 +45,7 @@ procedure Main is
    TokStr2       : Unbounded_String;
    ValueStack    : VariableStore.Database;
    VariableStack : VariableStore.Database;
-   IsLocked      : Boolean;
+   IsLocked      : Boolean := False;
 
 begin
    -- Initial Arguments

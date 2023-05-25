@@ -5,47 +5,17 @@ package body Lock with
 is
 
    procedure Lock
-     (CurrentPIN : out PIN.PIN; s : in String; IsLocked : out Boolean)
+     (CurrentPIN : out PIN.PIN; s : in String; IsLocked : in out Boolean)
    is
    begin
-      CurrentPIN := PIN.From_String ("0000");
-
-      if s'Length /= 4 then
-         return;
-      end if;
-
-      for I in s'Range loop
-         if s (I) < '0' or s (I) > '9' then
-            return;
-         end if;
-
-         pragma Loop_Invariant
-           (for all J in s'First .. I => (s (J) >= '0' and s (J) <= '9'));
-
-      end loop;
-
-      CurrentPIN := PIN.From_String (s);
+      CurrentPIN := PIN.From_String(s);
       IsLocked   := True;
    end Lock;
 
    procedure Unlock
-     (CurrentPIN : in PIN.PIN; s : in String; IsLocked : out Boolean)
+     (CurrentPIN : in PIN.PIN; s : in String; IsLocked : in out Boolean)
    is
    begin
-      if s'Length /= 4 then
-         return;
-      end if;
-
-      for I in s'Range loop
-         if s (I) < '0' or s (I) > '9' then
-            return;
-         end if;
-
-         pragma Loop_Invariant
-           (for all J in s'First .. I => (s (J) >= '0' and s (J) <= '9'));
-
-      end loop;
-
       if PIN."=" (CurrentPIN, PIN.From_String (s)) then
          IsLocked := False;
       end if;
