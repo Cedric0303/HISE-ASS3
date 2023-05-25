@@ -9,11 +9,12 @@
 -- Load is performed when store has var and stack is not full
 -- Store is performed stack has value, store is not full or already has value stored (to remove)
 -- Remove is performed if variable exists in store
+-- Unlock is only performed from the locked state
+-- Unlock removes lock if pins match and vice versa.
+-- Lock updates the master PIN when performed
 
 -- To prove:
 -- Operations (except for unlock) are performed only when unlocked
--- Unlock is only performed from the locked state
--- Lock updates the master PIN when performed
 
 -- To do:
 -- Move print to stdout into main? (side-effects)
