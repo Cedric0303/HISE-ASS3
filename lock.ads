@@ -1,13 +1,17 @@
 with PIN;
 
-package Lock with SPARK_Mode is
+package Lock with
+ SPARK_Mode
+is
 
-   procedure Lock(CurrentPIN: out PIN.PIN; s: in String);
+  procedure Lock
+   (CurrentPIN : out PIN.PIN; s : in String; IsLocked : out Boolean) with
+   Post => (IsLocked and PIN."=" (CurrentPIN, PIN.From_String (s)));
 
-   procedure Unlock(CurrentPIN: in PIN.PIN; s: in String);
+  procedure Unlock
+   (CurrentPIN : in PIN.PIN; s : in String; IsLocked : out Boolean) with
+   Post => (not IsLocked and PIN."=" (CurrentPIN, PIN.From_String (s)));
 
-   function IsLocked return Boolean;
-
-   function IsInvalidPIN(s: in String) return Boolean;
+  function IsInvalidPIN (s : in String) return Boolean;
 
 end Lock;
