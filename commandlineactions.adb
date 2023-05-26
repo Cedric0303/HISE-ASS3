@@ -8,18 +8,10 @@ package body CommandLineActions with
   SPARK_Mode
 is
 
-   procedure PutState (locked : in Boolean) is
-   begin
-      if locked then
-         Put ("locked> ");
-      else
-         Put ("unlocked>   ");
-      end if;
-   end PutState;
-
-   procedure ProcessLine
-     (S   : in     String; command : out Unbounded_String;
-      arg :    out Unbounded_String)
+   procedure ProcessLine(S : in String; 
+                         valid : out Boolean;
+                         command : out Unbounded_String;
+                         arg : out Unbounded_String)
    is
       package Lines is new MyString (Max_MyString_Length => 2048);
       NumTokens : Natural;
@@ -33,6 +25,7 @@ is
       begin
          command := Null_Unbounded_String;
          arg     := Null_Unbounded_String;
+         valid   := False;
 
          if S'Length > 2048 then
             return;
@@ -61,7 +54,8 @@ is
                end if;
 
                ArgString := Lines.Substring(LinesString, T (2).Start, T (2).Start + T (2).Length - 1);
-               arg     := To_Unbounded_String(Lines.To_String(ArgString));
+               arg := To_Unbounded_String(Lines.To_String(ArgString));
+               valid := True;
 
             end if;
          elsif NumTokens = 1 then
@@ -74,9 +68,8 @@ is
 
                CommandString := Lines.Substring(LinesString, T (1).Start, T (1).Start + T (1).Length - 1);
                command := To_Unbounded_String(Lines.To_String(CommandString));
+               valid := True;
             end if;
-         else
-            Put_Line ("Invalid command.");
          end if;
       end;
    end ProcessLine;
