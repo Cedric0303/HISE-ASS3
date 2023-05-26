@@ -204,7 +204,7 @@ begin
                   end if;
                elsif arg1 = "list" then 
                   Calculator.List (VariableStack, IsLocked);
-                  --  Calculator.List (ValueStack, IsLocked);
+                  Calculator.List (ValueStack, IsLocked);
                else
                   Put_Line ("Invalid command.");
                   return;

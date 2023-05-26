@@ -23,17 +23,17 @@ package body Calculator with SPARK_Mode is
 
          val1 := VariableStore.Get(ValueStack, val1var);
          val2 := VariableStore.Get(ValueStack, val2var);
-         if VariableStore.Has_Variable(ValueStack, val1var) then
-            VariableStore.Remove(ValueStack, val1var);
-         end if;
-         if VariableStore.Has_Variable(ValueStack, val2var) then
-            VariableStore.Remove(ValueStack, val2var);
-         end if;
          
          if VariableStore.Length(ValueStack) < VariableStore.Max_Entries or
           VariableStore.Has_Variable(ValueStack, var) then
             if ((val1 >= 0 and then val2 <= Integer'Last - val1) or else
             (val1 < 0 and then val2 >= Integer'First - val1))  then
+            if VariableStore.Has_Variable(ValueStack, val1var) then
+               VariableStore.Remove(ValueStack, val1var);
+            end if;
+            if VariableStore.Has_Variable(ValueStack, val2var) then
+               VariableStore.Remove(ValueStack, val2var);
+            end if;
                VariableStore.Put(ValueStack, var, val1 + val2);
             end if;
          end if;
@@ -57,19 +57,26 @@ package body Calculator with SPARK_Mode is
 
          val1 := VariableStore.Get(ValueStack, val1var);
          val2 := VariableStore.Get(ValueStack, val2var);
-         if VariableStore.Has_Variable(ValueStack, val1var) then
-            VariableStore.Remove(ValueStack, val1var);
-         end if;
-         if VariableStore.Has_Variable(ValueStack, val2var) then
-            VariableStore.Remove(ValueStack, val2var);
-         end if;
+         Put("val1: ");Ada.Integer_Text_IO.Put(val1);Put_Line("");
+         Put("val2: ");Ada.Integer_Text_IO.Put(val2);Put_Line("");
          
          if VariableStore.Length(ValueStack) < VariableStore.Max_Entries or
           VariableStore.Has_Variable(ValueStack, var) then
             if ((val1 >= 0 and then val2 >= Integer'Last - val1) or else
               (val1 < 0 and then val2 <= Integer'First - val1))  then
+
+            Put_Line("TRUE");
+            Put("val1 - val2: ");Ada.Integer_Text_IO.Put(val1-val2);Put_Line("");
+            if VariableStore.Has_Variable(ValueStack, val2var) then
+               VariableStore.Remove(ValueStack, val2var);
+            end if;
+            if VariableStore.Has_Variable(ValueStack, val1var) then
+               VariableStore.Remove(ValueStack, val1var);
+            end if;
                VariableStore.Put(ValueStack, var, val1 - val2);
             end if;
+            Put_Line("FALSE");
+
          end if;
       end;
    end Minus;
@@ -91,17 +98,17 @@ package body Calculator with SPARK_Mode is
 
          val1 := VariableStore.Get(ValueStack, val1var);
          val2 := VariableStore.Get(ValueStack, val2var);
-         if VariableStore.Has_Variable(ValueStack, val1var) then
-            VariableStore.Remove(ValueStack, val1var);
-         end if;
-         if VariableStore.Has_Variable(ValueStack, val2var) then
-            VariableStore.Remove(ValueStack, val2var);
-         end if;
          
          if VariableStore.Length(ValueStack) < VariableStore.Max_Entries or
           VariableStore.Has_Variable(ValueStack, var) then
             if (((val1 < 2**15 and val2 < ((2**16) - 1)) and (val1 > -2**15 and val2 > -2**16)) or else
             ((val1 < ((2**16) - 1) and val2 < 2**15) and (val1 > -2**16 and val2 > -2**15))) then
+            if VariableStore.Has_Variable(ValueStack, val1var) then
+               VariableStore.Remove(ValueStack, val1var);
+            end if;
+            if VariableStore.Has_Variable(ValueStack, val2var) then
+               VariableStore.Remove(ValueStack, val2var);
+            end if;
                VariableStore.Put(ValueStack, var, val1 * val2);
             end if;
          end if;
@@ -125,16 +132,16 @@ package body Calculator with SPARK_Mode is
 
          val1 := VariableStore.Get(ValueStack, val1var);
          val2 := VariableStore.Get(ValueStack, val2var);
-         if VariableStore.Has_Variable(ValueStack, val1var) then
-            VariableStore.Remove(ValueStack, val1var);
-         end if;
-         if VariableStore.Has_Variable(ValueStack, val2var) then
-            VariableStore.Remove(ValueStack, val2var);
-         end if;
 
          if VariableStore.Length(ValueStack) < VariableStore.Max_Entries or
           VariableStore.Has_Variable(ValueStack, var) then
             if (val2 /= 0 and not (val1 = Integer'First and val2 = -1)) then
+            if VariableStore.Has_Variable(ValueStack, val1var) then
+               VariableStore.Remove(ValueStack, val1var);
+            end if;
+            if VariableStore.Has_Variable(ValueStack, val2var) then
+               VariableStore.Remove(ValueStack, val2var);
+            end if;
                VariableStore.Put(ValueStack, var, val1 / val2);
             end if;
          end if;

@@ -10,7 +10,7 @@ is
   procedure Plus (ValueStack : in out VariableStore.Database; IsLocked : in Boolean) with
      Pre =>
        not IsLocked and
-    Integer (VariableStore.Length (ValueStack)) >= 2 and
+    Integer (VariableStore.Length (ValueStack)) > 2 and
     VariableStore.Has_Variable
      (ValueStack,
       VariableStore.From_String
@@ -23,7 +23,7 @@ is
   procedure Minus (ValueStack : in out VariableStore.Database; IsLocked : in Boolean) with
    Pre =>
        not IsLocked and
-    Integer (VariableStore.Length (ValueStack)) >= 2 and
+    Integer (VariableStore.Length (ValueStack)) > 2 and
     VariableStore.Has_Variable
      (ValueStack,
       VariableStore.From_String
@@ -36,7 +36,7 @@ is
   procedure Multiply (ValueStack : in out VariableStore.Database; IsLocked : in Boolean) with
    Pre =>
        not IsLocked and
-    Integer (VariableStore.Length (ValueStack)) >= 2 and
+    Integer (VariableStore.Length (ValueStack)) > 2 and
     VariableStore.Has_Variable
      (ValueStack,
       VariableStore.From_String
@@ -49,7 +49,7 @@ is
   procedure Divide (ValueStack : in out VariableStore.Database; IsLocked : in Boolean) with
    Pre =>
        not IsLocked and
-    Integer (VariableStore.Length (ValueStack)) >= 2 and
+    Integer (VariableStore.Length (ValueStack)) > 2 and
     VariableStore.Has_Variable
      (ValueStack,
       VariableStore.From_String
