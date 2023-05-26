@@ -12,3 +12,4 @@
 /.vscode
 /obj
 main
+.DS_Store

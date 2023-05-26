@@ -9,7 +9,7 @@
 --    This is proven because the IsLocked boolean (calculator state) is passed
 --    into the procedures and checked with SPARK to be false (unlocked) in its
 --    precondition.
--- 2. Push and pop are only performed when unlocked.
+-- 2. Push, pop and list are only performed when unlocked.
 --    Similar to above, IsLocked passed in and checked in its precondition.
 -- 3. Lock is only performed when the calculater is in the unlocked state.
 --    Similar to above, IsLocked passed in and checked in its precondition.
