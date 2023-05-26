@@ -84,177 +84,133 @@ begin
       end if;
 
       Lines.Get_Line(S);
-
-      if Lines.Length(S) > 2048 then
-         Put_Line("Input too long.");
-         return;
-      end if;
-
-      CommandLineActions.ProcessLine(Lines.To_String(S), TokStr1, TokStr2);
-
-                  Lock.Unlock (CurrentPIN, arg2, IsLocked);
+      CommandLineActions.ProcessLine(Lines.To_String(S), IsValidCmd, TokStr1, TokStr2);
+      if IsValidCmd then
+         declare
+            arg1 : String := To_String (TokStr1);
+            arg2 : String := To_String (TokStr2);
+         begin
+            -- Lock operations - no effect when state matches lock state
+            if IsLocked then
+               if arg1 = "unlock" then
+                  if Lock.IsInvalidPIN (arg2) then
+                     Put_Line ("Invalid PIN.");
+                  else
+                     Lock.Unlock (CurrentPIN, arg2, IsLocked);
+                  end if;
 
                   if IsLocked then
                      Put_Line("Incorrect PIN.");
                   end if;
-               else
-                  Put_Line("Already Unlocked.");
-               end if;
-            elsif arg1 = "lock" then
-               if not IsLocked then
-                  if Lock.IsInvalidPIN (arg2) then
-                     Put_Line ("Invalid PIN.");
-                     return;
-                  end if;
 
-                  Lock.Lock (CurrentPIN, arg2, IsLocked);
-               else
+               elsif arg1 = "lock" then
                   Put_Line ("Already locked.");
                end if;
 
-            -- Arithmetic operations -
-            elsif arg1 = "+" then
-               if Integer (VariableStore.Length (ValueStack)) > 2 and VariableStore.Has_Variable(ValueStack, VariableStore.From_String(Integer (Integer (VariableStore.Length (ValueStack)) - 2)'Image)) and VariableStore.Has_Variable(ValueStack, VariableStore.From_String(Integer (Integer (VariableStore.Length (ValueStack)) - 1)'Image)) then
-                  Calculator.Plus (ValueStack);
-               else
-                  Put_Line ("Invalid Stack.");
-                  return;
-               end if;
-            elsif arg1 = "-" then
-               if Integer (VariableStore.Length (ValueStack)) > 2 and VariableStore.Has_Variable(ValueStack, VariableStore.From_String(Integer (Integer (VariableStore.Length (ValueStack)) - 2)'Image)) and VariableStore.Has_Variable(ValueStack, VariableStore.From_String(Integer (Integer (VariableStore.Length (ValueStack)) - 1)'Image)) then
-                  Calculator.Minus (ValueStack);
-               else
-                  Put_Line ("Invalid Stack.");
-                  return;
-               end if;
-            elsif arg1 = "*" then
-               if Integer (VariableStore.Length (ValueStack)) > 2 and VariableStore.Has_Variable(ValueStack, VariableStore.From_String(Integer (Integer (VariableStore.Length (ValueStack)) - 2)'Image)) and VariableStore.Has_Variable(ValueStack, VariableStore.From_String(Integer (Integer (VariableStore.Length (ValueStack)) - 1)'Image)) then
-                  Calculator.Multiply (ValueStack);
-               else
-                  Put_Line ("Invalid Stack.");
-                  return;
-               end if;
-            elsif arg1 = "/" then
-               if Integer (VariableStore.Length (ValueStack)) > 2 and VariableStore.Has_Variable(ValueStack, VariableStore.From_String(Integer (Integer (VariableStore.Length (ValueStack)) - 2)'Image)) and VariableStore.Has_Variable(ValueStack, VariableStore.From_String(Integer (Integer (VariableStore.Length (ValueStack)) - 1)'Image))then
-                  Calculator.Divide (ValueStack);
-               else
-                  Put_Line ("Invalid Stack.");
-                  return;
-               end if;
+            -- Unlock operations - no effect when state matches unlock state
+            elsif not IsLocked then
+               if arg1 = "lock" then
+                  if Lock.IsInvalidPIN (arg2) then
+                     Put_Line ("Invalid PIN.");
+                  else
+                     Lock.Lock (CurrentPIN, arg2, IsLocked);
+                  end if;
 
-            -- store operations
-            elsif arg1 = "push" then
-               if (VariableStore.Length (ValueStack) < 512 or VariableStore.Has_Variable (ValueStack, VariableStore.From_String (Integer (Integer (VariableStore.Length (ValueStack)))'Image))) then
-                  Calculator.Push(ValueStack, StringToInteger.From_String (arg2));
-               else
-                  Put_Line ("Invalid Operation.");
-                  return;
-               end if;
-            elsif arg1 = "pop" then
-               if VariableStore.Has_Variable(ValueStack,VariableStore.From_String(Integer (Integer (VariableStore.Length (ValueStack)) - 1)'Image)) then
-                  Calculator.Pop (ValueStack);
-               else
-                  Put_Line ("Invalid Operation.");
-                  return;
-               end if;
+               elsif arg1 = "unlock" then
+                  Put_Line ("Already unlocked.");
 
-         -- Arithmetic operations
-         elsif not IsLocked then
-            if arg1 = "+" then
-               if Integer (VariableStore.Length (ValueStack)) >= 2 and VariableStore.Has_Variable(ValueStack, VariableStore.From_String(Integer (Integer (VariableStore.Length (ValueStack)) - 2)'Image)) and VariableStore.Has_Variable(ValueStack, VariableStore.From_String(Integer (Integer (VariableStore.Length (ValueStack)) - 1)'Image)) then
-                  Calculator.Plus (ValueStack, IsLocked);
-               else
-                  Put_Line ("Not enough values in stack.");
-                  return;
-               end if;
-            elsif arg1 = "-" then
-               if Integer (VariableStore.Length (ValueStack)) >= 2 and VariableStore.Has_Variable(ValueStack, VariableStore.From_String(Integer (Integer (VariableStore.Length (ValueStack)) - 2)'Image)) and VariableStore.Has_Variable(ValueStack, VariableStore.From_String(Integer (Integer (VariableStore.Length (ValueStack)) - 1)'Image)) then
-                  Calculator.Minus (ValueStack, IsLocked);
-               else
-                  Put_Line ("Not enough values in stack.");
-                  return;
-               end if;
-            elsif arg1 = "*" then
-               if Integer (VariableStore.Length (ValueStack)) >= 2 and VariableStore.Has_Variable(ValueStack, VariableStore.From_String(Integer (Integer (VariableStore.Length (ValueStack)) - 2)'Image)) and VariableStore.Has_Variable(ValueStack, VariableStore.From_String(Integer (Integer (VariableStore.Length (ValueStack)) - 1)'Image)) then
-                  Calculator.Multiply (ValueStack, IsLocked);
-               else
-                  Put_Line ("Not enough values in stack.");
-                  return;
-               end if;
-            elsif arg1 = "/" then
-               if Integer (VariableStore.Length (ValueStack)) >= 2 and VariableStore.Has_Variable(ValueStack, VariableStore.From_String(Integer (Integer (VariableStore.Length (ValueStack)) - 2)'Image)) and VariableStore.Has_Variable(ValueStack, VariableStore.From_String(Integer (Integer (VariableStore.Length (ValueStack)) - 1)'Image))then
-                  Calculator.Divide (ValueStack, IsLocked);
-               else
-                  Put_Line ("Not enough values in stack.");
-                  return;
-               end if;
+               -- Arithmetic operations -
+               elsif arg1 = "+" then
+                  if Integer (VariableStore.Length (ValueStack)) >= 2 and 
+                  VariableStore.Has_Variable(ValueStack, VariableStore.From_String(Integer (Integer (VariableStore.Length (ValueStack)) - 2)'Image)) and 
+                  VariableStore.Has_Variable(ValueStack, VariableStore.From_String(Integer (Integer (VariableStore.Length (ValueStack)) - 1)'Image)) 
+                  then
+                     Calculator.Plus (ValueStack, IsLocked);
+                  else
+                     Put_Line ("Invalid Stack.");
+                     return;
+                  end if;
+               elsif arg1 = "-" then
+                  if Integer (VariableStore.Length (ValueStack)) >= 2 and 
+                  VariableStore.Has_Variable(ValueStack, VariableStore.From_String(Integer (Integer (VariableStore.Length (ValueStack)) - 2)'Image)) and 
+                  VariableStore.Has_Variable(ValueStack, VariableStore.From_String(Integer (Integer (VariableStore.Length (ValueStack)) - 1)'Image)) 
+                  then
+                     Calculator.Minus (ValueStack, IsLocked);
+                  else
+                     Put_Line ("Invalid Stack.");
+                     return;
+                  end if;
+               elsif arg1 = "*" then
+                  if Integer (VariableStore.Length (ValueStack)) >= 2 and 
+                  VariableStore.Has_Variable(ValueStack, VariableStore.From_String(Integer (Integer (VariableStore.Length (ValueStack)) - 2)'Image)) and 
+                  VariableStore.Has_Variable(ValueStack, VariableStore.From_String(Integer (Integer (VariableStore.Length (ValueStack)) - 1)'Image)) 
+                  then
+                     Calculator.Multiply (ValueStack, IsLocked);
+                  else
+                     Put_Line ("Invalid Stack.");
+                     return;
+                  end if;
+               elsif arg1 = "/" then
+                  if Integer (VariableStore.Length (ValueStack)) >= 2 and 
+                  VariableStore.Has_Variable(ValueStack, VariableStore.From_String(Integer (Integer (VariableStore.Length (ValueStack)) - 2)'Image)) and 
+                  VariableStore.Has_Variable(ValueStack, VariableStore.From_String(Integer (Integer (VariableStore.Length (ValueStack)) - 1)'Image)) 
+                  then
+                     Calculator.Divide (ValueStack, IsLocked);
+                  else
+                     Put_Line ("Invalid Stack.");
+                     return;
+                  end if;
 
-               -- Store operations
-            elsif arg1 = "push" then
-               if (VariableStore.Length (ValueStack) < 512 or VariableStore.Has_Variable (ValueStack, VariableStore.From_String (Integer (Integer (VariableStore.Length (ValueStack)))'Image))) then
-                  Calculator.Push(ValueStack, StringToInteger.From_String (arg2), IsLocked);
-               else
-                  Put_Line ("Stack full.");
-                  return;
-               end if;
-            elsif arg1 = "pop" then
-               if VariableStore.Has_Variable(ValueStack,VariableStore.From_String(Integer (Integer (VariableStore.Length (ValueStack)) - 1)'Image)) then
-                  Calculator.Pop (ValueStack, IsLocked);
-               else
-                  Put_Line ("Stack empty.");
-                  return;
-               end if;
+               -- store operations
+               elsif arg1 = "push" then
+                  if (VariableStore.Length (ValueStack) < Calculator.Value_Stack_Size or 
+                  VariableStore.Has_Variable (ValueStack, VariableStore.From_String (Integer (Integer (VariableStore.Length (ValueStack)))'Image))) 
+                  then
+                     Calculator.Push(ValueStack, StringToInteger.From_String (arg2), IsLocked);
+                  else
+                     Put_Line ("Invalid Operation.");
+                     return;
+                  end if;
+               elsif arg1 = "pop" then
+                  if VariableStore.Has_Variable(ValueStack,VariableStore.From_String(Integer (Integer (VariableStore.Length (ValueStack)) - 1)'Image)) 
+                  then
+                     Calculator.Pop (ValueStack, IsLocked);
+                  else
+                     Put_Line ("Invalid Operation.");
+                     return;
+                  end if;
 
-            elsif arg1 = "load" then
-               if (arg2'Length <= VariableStore.Max_Variable_Length and then (VariableStore.Has_Variable(VariableStack, VariableStore.From_String (arg2)) and (VariableStore.Length (ValueStack) < 512 or VariableStore.Has_Variable(ValueStack,VariableStore.From_String(Integer (Integer (VariableStore.Length (ValueStack)))'Image))))) then
-                  Calculator.Load(ValueStack, VariableStack, VariableStore.From_String (arg2), IsLocked);
-               elsif arg2'Length > VariableStore.Max_Variable_Length or else not VariableStore.Has_Variable(VariableStack, VariableStore.From_String (arg2)) then
-                  Put_Line ("Variable not found.");
-                  return;
-               elsif VariableStore.Length (ValueStack) >= 512 or VariableStore.Has_Variable(ValueStack,VariableStore.From_String(Integer (Integer (VariableStore.Length (ValueStack)))'Image)) then
-                  Put_Line ("Cannot add to stack.");
-                  return;
+               elsif arg1 = "load" then
+                  if (arg2'Length <= VariableStore.Max_Variable_Length and then (VariableStore.Has_Variable(VariableStack, VariableStore.From_String (arg2)) and (VariableStore.Length (ValueStack) < Calculator.Value_Stack_Size or VariableStore.Has_Variable(ValueStack,VariableStore.From_String(Integer (Integer (VariableStore.Length (ValueStack)))'Image))))) then
+                     Calculator.Load(ValueStack, VariableStack, VariableStore.From_String (arg2), IsLocked);
+                  else
+                     Put_Line ("Invalid Operation.");
+                     return;
+                  end if;
+               elsif arg1 = "store" then
+                  if (arg2'Length <= VariableStore.Max_Variable_Length and VariableStore.Has_Variable(ValueStack,VariableStore.From_String(Integer(Integer (VariableStore.Length (ValueStack)) - 1)'Image)))
+                     and then (VariableStore.Length (VariableStack) < VariableStore.Max_Entries or VariableStore.Has_Variable (VariableStack, VariableStore.From_String (arg2))) then
+                     Calculator.Store(ValueStack, VariableStack, VariableStore.From_String (arg2), IsLocked);
+                  else
+                     Put_Line ("Invalid Operation.");
+                     return;
+                  end if;
+               elsif arg1 = "remove" then
+                  if (arg2'Length <= VariableStore.Max_Variable_Length and then VariableStore.Has_Variable (VariableStack, VariableStore.From_String (arg2))) then
+                     Calculator.Remove(VariableStack, VariableStore.From_String (arg2), IsLocked);
+                  else
+                     Put_Line ("Invalid Operation.");
+                     return;
+                  end if;
+               elsif arg1 = "list" then 
+                  Calculator.List (VariableStack, IsLocked);
+                  --  Calculator.List (ValueStack, IsLocked);
                else
-                  Put_Line ("Invalid Operation.");
+                  Put_Line ("Invalid command.");
                   return;
                end if;
-            elsif arg1 = "store" then
-               if (arg2'Length <= VariableStore.Max_Variable_Length and VariableStore.Has_Variable(ValueStack,VariableStore.From_String(Integer(Integer (VariableStore.Length (ValueStack)) - 1)'Image)))
-                 and then (VariableStore.Length (VariableStack) < VariableStore.Max_Entries or VariableStore.Has_Variable (VariableStack, VariableStore.From_String (arg2))) then
-                  Calculator.Store(ValueStack, VariableStack, VariableStore.From_String (arg2), IsLocked);
-               elsif arg2'Length > VariableStore.Max_Variable_Length then
-                  Put_Line ("Invalid variable name.");
-                  return;
-               elsif not VariableStore.Has_Variable(ValueStack,VariableStore.From_String(Integer(Integer (VariableStore.Length (ValueStack)) - 1)'Image)) then
-                  Put_Line ("Empty stack.");
-                  return;
-               elsif VariableStore.Length (VariableStack) >= VariableStore.Max_Entries and not VariableStore.Has_Variable (VariableStack, VariableStore.From_String (arg2)) then
-                  Put_Line ("Store full.");
-                  return;
-               else
-                  Put_Line ("Invalid Operation.");
-                  return;
-               end if;
-            elsif arg1 = "remove" then
-               if (arg2'Length <= VariableStore.Max_Variable_Length and then VariableStore.Has_Variable (VariableStack, VariableStore.From_String (arg2))) then
-                  Calculator.Remove(VariableStack, VariableStore.From_String (arg2), IsLocked);
-               elsif arg2'Length > VariableStore.Max_Variable_Length or else VariableStore.Has_Variable (VariableStack, VariableStore.From_String (arg2)) then
-                  Put_Line ("Variable not found.");
-                  return;
-               else
-                  Put_Line ("Invalid Operation.");
-                  return;
-               end if;
-            elsif arg1 = "list" then
-               VariableStore.Print(VariableStack);
-            else
-               Put_Line ("Invalid command.");
-               return;
             end if;
-         else
-            Put_Line("Calculator locked.");
-            return;
-         end if;
-      end;
+         end;
+      end if;
    end loop;
 end Main;

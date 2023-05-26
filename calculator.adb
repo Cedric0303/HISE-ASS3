@@ -11,27 +11,27 @@ package body Calculator with SPARK_Mode is
       declare
          val1var : VariableStore.Variable;
          val2var : VariableStore.Variable;
-         stackpos1 : Integer := Integer(VariableStore.Length(ValueStack)) - 2;
-         stackpos2 : Integer := Integer(VariableStore.Length(ValueStack)) - 1;
+         stackpos1 : Integer := Integer(VariableStore.Length(ValueStack)) - 1;
+         stackpos2 : Integer := Integer(VariableStore.Length(ValueStack)) - 2;
          val1 : Integer;
          val2 : Integer;
          var : VariableStore.Variable;
       begin
          val1var := VariableStore.From_String(stackpos1'Image);
          val2var := VariableStore.From_String(stackpos2'Image);
-         var := VariableStore.From_String(stackpos1'Image);
+         var := VariableStore.From_String(stackpos2'Image);
 
          val1 := VariableStore.Get(ValueStack, val1var);
          val2 := VariableStore.Get(ValueStack, val2var);
-         if VariableStore.Has_Variable(ValueStack, val2var) then
-            VariableStore.Remove(ValueStack, val2var);
-         end if;
          if VariableStore.Has_Variable(ValueStack, val1var) then
             VariableStore.Remove(ValueStack, val1var);
          end if;
+         if VariableStore.Has_Variable(ValueStack, val2var) then
+            VariableStore.Remove(ValueStack, val2var);
+         end if;
          
          if VariableStore.Length(ValueStack) < VariableStore.Max_Entries or
-         VariableStore.Has_Variable(ValueStack, var) then
+          VariableStore.Has_Variable(ValueStack, var) then
             if ((val1 >= 0 and then val2 <= Integer'Last - val1) or else
             (val1 < 0 and then val2 >= Integer'First - val1))  then
                VariableStore.Put(ValueStack, var, val1 + val2);
@@ -45,23 +45,23 @@ package body Calculator with SPARK_Mode is
       declare
          val1var : VariableStore.Variable;
          val2var : VariableStore.Variable;
-         stackpos1 : Integer := Integer(VariableStore.Length(ValueStack)) - 2;
-         stackpos2 : Integer := Integer(VariableStore.Length(ValueStack)) - 1;
+         stackpos1 : Integer := Integer(VariableStore.Length(ValueStack)) - 1;
+         stackpos2 : Integer := Integer(VariableStore.Length(ValueStack)) - 2;
          val1 : Integer;
          val2 : Integer;
          var : VariableStore.Variable;
       begin
          val1var := VariableStore.From_String(stackpos1'Image);
          val2var := VariableStore.From_String(stackpos2'Image);
-         var := VariableStore.From_String(stackpos1'Image);
+         var := VariableStore.From_String(stackpos2'Image);
 
          val1 := VariableStore.Get(ValueStack, val1var);
          val2 := VariableStore.Get(ValueStack, val2var);
-         if VariableStore.Has_Variable(ValueStack, val2var) then
-            VariableStore.Remove(ValueStack, val2var);
-         end if;
          if VariableStore.Has_Variable(ValueStack, val1var) then
             VariableStore.Remove(ValueStack, val1var);
+         end if;
+         if VariableStore.Has_Variable(ValueStack, val2var) then
+            VariableStore.Remove(ValueStack, val2var);
          end if;
          
          if VariableStore.Length(ValueStack) < VariableStore.Max_Entries or
@@ -79,23 +79,23 @@ package body Calculator with SPARK_Mode is
       declare
          val1var : VariableStore.Variable;
          val2var : VariableStore.Variable;
-         stackpos1 : Integer := Integer(VariableStore.Length(ValueStack)) - 2;
-         stackpos2 : Integer := Integer(VariableStore.Length(ValueStack)) - 1;
+         stackpos1 : Integer := Integer(VariableStore.Length(ValueStack)) - 1;
+         stackpos2 : Integer := Integer(VariableStore.Length(ValueStack)) - 2;
          val1 : Integer;
          val2 : Integer;
          var : VariableStore.Variable;
       begin
          val1var := VariableStore.From_String(stackpos1'Image);
          val2var := VariableStore.From_String(stackpos2'Image);
-         var := VariableStore.From_String(stackpos1'Image);
+         var := VariableStore.From_String(stackpos2'Image);
 
          val1 := VariableStore.Get(ValueStack, val1var);
          val2 := VariableStore.Get(ValueStack, val2var);
-         if VariableStore.Has_Variable(ValueStack, val2var) then
-            VariableStore.Remove(ValueStack, val2var);
-         end if;
          if VariableStore.Has_Variable(ValueStack, val1var) then
             VariableStore.Remove(ValueStack, val1var);
+         end if;
+         if VariableStore.Has_Variable(ValueStack, val2var) then
+            VariableStore.Remove(ValueStack, val2var);
          end if;
          
          if VariableStore.Length(ValueStack) < VariableStore.Max_Entries or
@@ -113,23 +113,23 @@ package body Calculator with SPARK_Mode is
       declare
          val1var : VariableStore.Variable;
          val2var : VariableStore.Variable;
-         stackpos1 : Integer := Integer(VariableStore.Length(ValueStack)) - 2;
-         stackpos2 : Integer := Integer(VariableStore.Length(ValueStack)) - 1;
+         stackpos1 : Integer := Integer(VariableStore.Length(ValueStack)) - 1;
+         stackpos2 : Integer := Integer(VariableStore.Length(ValueStack)) - 2;
          val1 : Integer;
          val2 : Integer;
          var : VariableStore.Variable;
       begin
          val1var := VariableStore.From_String(stackpos1'Image);
          val2var := VariableStore.From_String(stackpos2'Image);
-         var := VariableStore.From_String(stackpos1'Image);
+         var := VariableStore.From_String(stackpos2'Image);
 
          val1 := VariableStore.Get(ValueStack, val1var);
          val2 := VariableStore.Get(ValueStack, val2var);
-         if VariableStore.Has_Variable(ValueStack, val2var) then
-            VariableStore.Remove(ValueStack, val2var);
-         end if;
          if VariableStore.Has_Variable(ValueStack, val1var) then
             VariableStore.Remove(ValueStack, val1var);
+         end if;
+         if VariableStore.Has_Variable(ValueStack, val2var) then
+            VariableStore.Remove(ValueStack, val2var);
          end if;
 
          if VariableStore.Length(ValueStack) < VariableStore.Max_Entries or
@@ -149,10 +149,6 @@ package body Calculator with SPARK_Mode is
          var : VariableStore.Variable := VariableStore.From_String(length'Image);
       begin
          VariableStore.Put(ValueStack, var, value);
-         --  if VariableStore.Length(ValueStack) < VariableStore.Max_Entries or
-         --    VariableStore.Has_Variable(ValueStack, var) then
-         --     VariableStore.Put(ValueStack, var, value);
-         --  end if;
       end;
    end Push;
    
@@ -202,5 +198,10 @@ package body Calculator with SPARK_Mode is
    begin
       VariableStore.Remove(VariableStack, var);
    end Remove;
+
+  procedure List(VariableStack : in VariableStore.Database; IsLocked : in Boolean) is
+   begin 
+      VariableStore.Print(VariableStack);
+   end List;
 
 end Calculator;

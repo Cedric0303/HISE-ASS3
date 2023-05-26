@@ -7,9 +7,10 @@ package body CommandLineActions with
   SPARK_Mode
 is
 
-   procedure ProcessLine
-     (S   : in     String; command : out Unbounded_String;
-      arg :    out Unbounded_String)
+   procedure ProcessLine(S : in String; 
+                         valid : out Boolean;
+                         command : out Unbounded_String;
+                         arg : out Unbounded_String)
    is
       package Lines is new MyString (Max_MyString_Length => 2048);
       NumTokens : Natural;
