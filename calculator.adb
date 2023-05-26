@@ -6,7 +6,7 @@ with StringToInteger;
 
 package body Calculator with SPARK_Mode is
     
-   procedure Plus(ValueStack : in out VariableStore.Database) is
+   procedure Plus(ValueStack : in out VariableStore.Database; IsLocked : in Boolean) is
    begin
       declare
          val1var : VariableStore.Variable;
@@ -40,7 +40,7 @@ package body Calculator with SPARK_Mode is
       end;
    end Plus;
   
-   procedure Minus(ValueStack : in out VariableStore.Database) is
+   procedure Minus(ValueStack : in out VariableStore.Database; IsLocked : in Boolean) is
    begin
       declare
          val1var : VariableStore.Variable;
@@ -74,7 +74,7 @@ package body Calculator with SPARK_Mode is
       end;
    end Minus;
    
-   procedure Multiply(ValueStack : in out VariableStore.Database) is
+   procedure Multiply(ValueStack : in out VariableStore.Database; IsLocked : in Boolean) is
    begin
       declare
          val1var : VariableStore.Variable;
@@ -108,7 +108,7 @@ package body Calculator with SPARK_Mode is
       end;
    end Multiply;
    
-   procedure Divide(ValueStack : in out VariableStore.Database) is
+   procedure Divide(ValueStack : in out VariableStore.Database; IsLocked : in Boolean) is
    begin
       declare
          val1var : VariableStore.Variable;
@@ -142,7 +142,7 @@ package body Calculator with SPARK_Mode is
    end Divide;
    
    procedure Push(ValueStack : in out VariableStore.Database;
-                  value : in Integer) is
+                  value : in Integer; IsLocked : in Boolean) is
    begin
       declare
          length : Integer := Integer(VariableStore.Length(ValueStack));
@@ -156,7 +156,7 @@ package body Calculator with SPARK_Mode is
       end;
    end Push;
    
-   procedure Pop(ValueStack : in out VariableStore.Database) is
+   procedure Pop(ValueStack : in out VariableStore.Database; IsLocked : in Boolean) is
    begin
       declare
          length : Integer := Integer(VariableStore.Length(ValueStack)) - 1;
@@ -168,7 +168,7 @@ package body Calculator with SPARK_Mode is
    
    procedure Load(ValueStack : in out VariableStore.Database;
                   VariableStack : in VariableStore.Database;
-                  OldVar : in VariableStore.Variable) is
+                  OldVar : in VariableStore.Variable; IsLocked : in Boolean) is
    begin
       declare
          value : Integer;
@@ -182,7 +182,7 @@ package body Calculator with SPARK_Mode is
    
    procedure Store(ValueStack : in out VariableStore.Database;
                    VariableStack : in out VariableStore.Database;
-                   var : in VariableStore.Variable) is
+                   var : in VariableStore.Variable; IsLocked : in Boolean) is
    begin
       declare
          length : Integer := Integer(VariableStore.Length(ValueStack)) - 1;
@@ -198,14 +198,9 @@ package body Calculator with SPARK_Mode is
    end Store;
    
    procedure Remove(VariableStack : in out VariableStore.Database;
-                    var : in VariableStore.Variable) is
+                    var : in VariableStore.Variable; IsLocked : in Boolean) is
    begin
       VariableStore.Remove(VariableStack, var);
    end Remove;
-
-   procedure List(VariableStack : in VariableStore.Database) is
-   begin 
-      VariableStore.Print(VariableStack);
-   end List;
 
 end Calculator;

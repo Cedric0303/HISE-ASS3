@@ -15,6 +15,6 @@ is
   function IsInvalidPIN(s : in String) return Boolean with
      Post =>
       (IsInvalidPIN'Result = False and s'Length = 4 and (for all I in s'Range => s(I) >= '0' and s(I) <= '9')) or
-      (IsInvalidPIN'Result = True and (s'Length /= 4 or (for some I in s'Range => s(I) < '0' or s(I) > '9')));
+     (IsInvalidPIN'Result = True and (s'Length /= 4 or (for some I in s'Range => s(I) < '0' or s(I) > '9')));
 
 end Lock;

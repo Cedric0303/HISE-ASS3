@@ -1,21 +1,11 @@
 with MyString;
 with MyStringTokeniser;
 
-with Ada.Text_IO;           use Ada.Text_IO;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 package body CommandLineActions with
   SPARK_Mode
 is
-
-   procedure PutState (locked : in Boolean) is
-   begin
-      if locked then
-         Put ("locked> ");
-      else
-         Put ("unlocked>   ");
-      end if;
-   end PutState;
 
    procedure ProcessLine
      (S   : in     String; command : out Unbounded_String;
@@ -33,10 +23,6 @@ is
       begin
          command := Null_Unbounded_String;
          arg     := Null_Unbounded_String;
-
-         if S'Length > 2048 then
-            return;
-         end if;
 
          MyStringTokeniser.Tokenise(S, T, NumTokens);
          LinesString := Lines.From_String(S);
@@ -76,7 +62,7 @@ is
                command := To_Unbounded_String(Lines.To_String(CommandString));
             end if;
          else
-            Put_Line ("Invalid command.");
+            command := To_Unbounded_String("invalid command");
          end if;
       end;
    end ProcessLine;

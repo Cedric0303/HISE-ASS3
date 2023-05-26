@@ -6,9 +6,23 @@ package Calculator with
  SPARK_Mode
 is
 
-  procedure Plus (ValueStack : in out VariableStore.Database) with
+  procedure Plus (ValueStack : in out VariableStore.Database; IsLocked : in Boolean) with
+     Pre =>
+       not IsLocked and
+    Integer (VariableStore.Length (ValueStack)) >= 2 and
+    VariableStore.Has_Variable
+     (ValueStack,
+      VariableStore.From_String
+       (Integer (Integer (VariableStore.Length (ValueStack)) - 2)'Image)) and
+    VariableStore.Has_Variable
+     (ValueStack,
+      VariableStore.From_String
+        (Integer (Integer (VariableStore.Length (ValueStack)) - 1)'Image));
+
+  procedure Minus (ValueStack : in out VariableStore.Database; IsLocked : in Boolean) with
    Pre =>
-    Integer (VariableStore.Length (ValueStack)) > 2 and
+       not IsLocked and
+    Integer (VariableStore.Length (ValueStack)) >= 2 and
     VariableStore.Has_Variable
      (ValueStack,
       VariableStore.From_String
@@ -18,9 +32,10 @@ is
       VariableStore.From_String
        (Integer (Integer (VariableStore.Length (ValueStack)) - 1)'Image));
 
-  procedure Minus (ValueStack : in out VariableStore.Database) with
+  procedure Multiply (ValueStack : in out VariableStore.Database; IsLocked : in Boolean) with
    Pre =>
-    Integer (VariableStore.Length (ValueStack)) > 2 and
+       not IsLocked and
+    Integer (VariableStore.Length (ValueStack)) >= 2 and
     VariableStore.Has_Variable
      (ValueStack,
       VariableStore.From_String
@@ -30,21 +45,10 @@ is
       VariableStore.From_String
        (Integer (Integer (VariableStore.Length (ValueStack)) - 1)'Image));
 
-  procedure Multiply (ValueStack : in out VariableStore.Database) with
+  procedure Divide (ValueStack : in out VariableStore.Database; IsLocked : in Boolean) with
    Pre =>
-    Integer (VariableStore.Length (ValueStack)) > 2 and
-    VariableStore.Has_Variable
-     (ValueStack,
-      VariableStore.From_String
-       (Integer (Integer (VariableStore.Length (ValueStack)) - 2)'Image)) and
-    VariableStore.Has_Variable
-     (ValueStack,
-      VariableStore.From_String
-       (Integer (Integer (VariableStore.Length (ValueStack)) - 1)'Image));
-
-  procedure Divide (ValueStack : in out VariableStore.Database) with
-   Pre =>
-    Integer (VariableStore.Length (ValueStack)) > 2 and
+       not IsLocked and
+    Integer (VariableStore.Length (ValueStack)) >= 2 and
     VariableStore.Has_Variable
      (ValueStack,
       VariableStore.From_String
@@ -55,16 +59,18 @@ is
        (Integer (Integer (VariableStore.Length (ValueStack)) - 1)'Image));
 
   procedure Push
-   (ValueStack : in out VariableStore.Database; value : in Integer) with
+   (ValueStack : in out VariableStore.Database; value : in Integer; IsLocked : in Boolean) with
    Pre =>
-    VariableStore.Length (ValueStack) < VariableStore.Max_Entries or
+       not IsLocked and
+    (VariableStore.Length (ValueStack) < 512 or
     VariableStore.Has_Variable
      (ValueStack,
       VariableStore.From_String
-       (Integer (Integer (VariableStore.Length (ValueStack)))'Image));
+       (Integer (Integer (VariableStore.Length (ValueStack)))'Image)));
 
-  procedure Pop (ValueStack : in out VariableStore.Database) with
+  procedure Pop (ValueStack : in out VariableStore.Database; IsLocked : in Boolean) with
    Pre =>
+       not IsLocked and
     VariableStore.Has_Variable
      (ValueStack,
       VariableStore.From_String
@@ -73,8 +79,10 @@ is
   procedure Load
    (ValueStack    : in out VariableStore.Database;
     VariableStack : in     VariableStore.Database;
-    OldVar        : in     VariableStore.Variable) with
+    OldVar        : in     VariableStore.Variable;
+    IsLocked : in Boolean) with
    Pre =>
+       not IsLocked and
     VariableStore.Has_Variable (VariableStack, OldVar) and
     (VariableStore.Length (ValueStack) < VariableStore.Max_Entries or
      VariableStore.Has_Variable
@@ -85,8 +93,10 @@ is
   procedure Store
    (ValueStack    : in out VariableStore.Database;
     VariableStack : in out VariableStore.Database;
-    var           : in     VariableStore.Variable) with
+    var           : in     VariableStore.Variable;
+    IsLocked : in Boolean) with
    Pre =>
+       not IsLocked and
     VariableStore.Has_Variable
      (ValueStack,
       VariableStore.From_String
@@ -96,11 +106,8 @@ is
 
   procedure Remove
    (VariableStack : in out VariableStore.Database;
-    var           : in     VariableStore.Variable) with
-   Pre => VariableStore.Has_Variable (VariableStack, var);
-
-  pragma Warnings (Off, "has no effect");
-  procedure List (VariableStack : in VariableStore.Database);
-  pragma Warnings (On, "has no effect");
+    var           : in     VariableStore.Variable;
+    IsLocked : in Boolean) with
+   Pre => not IsLocked and VariableStore.Has_Variable (VariableStack, var);
 
 end Calculator;
