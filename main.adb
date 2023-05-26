@@ -56,6 +56,7 @@ procedure Main is
    ValueStack    : VariableStore.Database;
    VariableStack : VariableStore.Database;
    IsLocked      : Boolean := False;
+   IsValidCmd    : Boolean;
 
 begin
    -- Initial Arguments
@@ -91,37 +92,71 @@ begin
 
       CommandLineActions.ProcessLine(Lines.To_String(S), TokStr1, TokStr2);
 
-      declare
-         arg1 : String := To_String (TokStr1);
-         arg2 : String := To_String (TokStr2);
-      begin
-         -- Lock operations - no effect when state matches lock state
-         if arg1 = "unlock" then
-            if IsLocked then
-               if Lock.IsInvalidPIN (arg2) then
-                  Put_Line ("Invalid PIN.");
+                  Lock.Unlock (CurrentPIN, arg2, IsLocked);
+
+                  if IsLocked then
+                     Put_Line("Incorrect PIN.");
+                  end if;
+               else
+                  Put_Line("Already Unlocked.");
+               end if;
+            elsif arg1 = "lock" then
+               if not IsLocked then
+                  if Lock.IsInvalidPIN (arg2) then
+                     Put_Line ("Invalid PIN.");
+                     return;
+                  end if;
+
+                  Lock.Lock (CurrentPIN, arg2, IsLocked);
+               else
+                  Put_Line ("Already locked.");
+               end if;
+
+            -- Arithmetic operations -
+            elsif arg1 = "+" then
+               if Integer (VariableStore.Length (ValueStack)) > 2 and VariableStore.Has_Variable(ValueStack, VariableStore.From_String(Integer (Integer (VariableStore.Length (ValueStack)) - 2)'Image)) and VariableStore.Has_Variable(ValueStack, VariableStore.From_String(Integer (Integer (VariableStore.Length (ValueStack)) - 1)'Image)) then
+                  Calculator.Plus (ValueStack);
+               else
+                  Put_Line ("Invalid Stack.");
+                  return;
+               end if;
+            elsif arg1 = "-" then
+               if Integer (VariableStore.Length (ValueStack)) > 2 and VariableStore.Has_Variable(ValueStack, VariableStore.From_String(Integer (Integer (VariableStore.Length (ValueStack)) - 2)'Image)) and VariableStore.Has_Variable(ValueStack, VariableStore.From_String(Integer (Integer (VariableStore.Length (ValueStack)) - 1)'Image)) then
+                  Calculator.Minus (ValueStack);
+               else
+                  Put_Line ("Invalid Stack.");
+                  return;
+               end if;
+            elsif arg1 = "*" then
+               if Integer (VariableStore.Length (ValueStack)) > 2 and VariableStore.Has_Variable(ValueStack, VariableStore.From_String(Integer (Integer (VariableStore.Length (ValueStack)) - 2)'Image)) and VariableStore.Has_Variable(ValueStack, VariableStore.From_String(Integer (Integer (VariableStore.Length (ValueStack)) - 1)'Image)) then
+                  Calculator.Multiply (ValueStack);
+               else
+                  Put_Line ("Invalid Stack.");
+                  return;
+               end if;
+            elsif arg1 = "/" then
+               if Integer (VariableStore.Length (ValueStack)) > 2 and VariableStore.Has_Variable(ValueStack, VariableStore.From_String(Integer (Integer (VariableStore.Length (ValueStack)) - 2)'Image)) and VariableStore.Has_Variable(ValueStack, VariableStore.From_String(Integer (Integer (VariableStore.Length (ValueStack)) - 1)'Image))then
+                  Calculator.Divide (ValueStack);
+               else
+                  Put_Line ("Invalid Stack.");
                   return;
                end if;
 
-               Lock.Unlock (CurrentPIN, arg2, IsLocked);
-
-               if IsLocked then
-                  Put_Line("Incorrect PIN.");
-               end if;
-            else
-               Put_Line("Already Unlocked.");
-            end if;
-         elsif arg1 = "lock" then
-            if not IsLocked then
-               if Lock.IsInvalidPIN (arg2) then
-                  Put_Line ("Invalid PIN.");
+            -- store operations
+            elsif arg1 = "push" then
+               if (VariableStore.Length (ValueStack) < 512 or VariableStore.Has_Variable (ValueStack, VariableStore.From_String (Integer (Integer (VariableStore.Length (ValueStack)))'Image))) then
+                  Calculator.Push(ValueStack, StringToInteger.From_String (arg2));
+               else
+                  Put_Line ("Invalid Operation.");
                   return;
                end if;
-
-               Lock.Lock (CurrentPIN, arg2, IsLocked);
-            else
-               Put_Line ("Already locked.");
-            end if;
+            elsif arg1 = "pop" then
+               if VariableStore.Has_Variable(ValueStack,VariableStore.From_String(Integer (Integer (VariableStore.Length (ValueStack)) - 1)'Image)) then
+                  Calculator.Pop (ValueStack);
+               else
+                  Put_Line ("Invalid Operation.");
+                  return;
+               end if;
 
          -- Arithmetic operations
          elsif not IsLocked then

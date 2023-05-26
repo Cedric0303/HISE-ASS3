@@ -23,6 +23,7 @@ is
       begin
          command := Null_Unbounded_String;
          arg     := Null_Unbounded_String;
+         valid   := False;
 
          MyStringTokeniser.Tokenise(S, T, NumTokens);
          LinesString := Lines.From_String(S);
@@ -47,7 +48,8 @@ is
                end if;
 
                ArgString := Lines.Substring(LinesString, T (2).Start, T (2).Start + T (2).Length - 1);
-               arg     := To_Unbounded_String(Lines.To_String(ArgString));
+               arg := To_Unbounded_String(Lines.To_String(ArgString));
+               valid := True;
 
             end if;
          elsif NumTokens = 1 then
@@ -60,6 +62,7 @@ is
 
                CommandString := Lines.Substring(LinesString, T (1).Start, T (1).Start + T (1).Length - 1);
                command := To_Unbounded_String(Lines.To_String(CommandString));
+               valid := True;
             end if;
          else
             command := To_Unbounded_String("invalid command");
